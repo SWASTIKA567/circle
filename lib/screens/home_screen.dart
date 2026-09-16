@@ -18,10 +18,10 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
   final List<String> _tabTitles = [
+    'Home & Events',
     'College Notes',
     'Circle AI Assistant',
     'Campus Societies',
-    'Events & Fests',
   ];
 
   String _getInitials(String name) {
@@ -168,11 +168,12 @@ class _HomeScreenState extends State<HomeScreen> {
     const primaryIndigo = Colors.indigo;
     final user = widget.authService.currentUser;
 
+    // EventsTab is the primary Home tab at index 0
     final tabs = [
+      EventsTab(authService: widget.authService),
       const NotesTab(),
       const ChatbotTab(),
       SocietiesTab(authService: widget.authService),
-      const EventsTab(),
     ];
 
     return Scaffold(
@@ -256,6 +257,11 @@ class _HomeScreenState extends State<HomeScreen> {
           indicatorColor: Colors.indigo.shade100,
           destinations: const [
             NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home_rounded, color: primaryIndigo),
+              label: 'Home',
+            ),
+            NavigationDestination(
               icon: Icon(Icons.menu_book_outlined),
               selectedIcon: Icon(Icons.menu_book_rounded, color: primaryIndigo),
               label: 'Notes',
@@ -269,11 +275,6 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icon(Icons.groups_outlined),
               selectedIcon: Icon(Icons.groups_rounded, color: primaryIndigo),
               label: 'Societies',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.event_outlined),
-              selectedIcon: Icon(Icons.event_rounded, color: primaryIndigo),
-              label: 'Events',
             ),
           ],
         ),
