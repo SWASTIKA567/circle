@@ -112,7 +112,7 @@ class _ChatbotTabState extends State<ChatbotTab> {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: _quickPrompts.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                separatorBuilder: (context, index) => const SizedBox(width: 8),
                 itemBuilder: (context, index) {
                   final prompt = _quickPrompts[index];
                   return ActionChip(
