@@ -104,7 +104,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.indigo.withOpacity(0.3),
+                            color: Colors.indigo.withValues(alpha: 0.3),
                             blurRadius: 16,
                             offset: const Offset(0, 8),
                           ),
@@ -153,7 +153,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       labelStyle: TextStyle(color: Colors.indigo.shade700),
                       prefixIcon: const Icon(Icons.person_outline_rounded, color: primaryIndigo),
                       filled: true,
-                      fillColor: Colors.indigo.shade50.withOpacity(0.4),
+                      fillColor: Colors.indigo.shade50.withValues(alpha: 0.4),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide(color: Colors.indigo.shade100, width: 1.5),
@@ -192,7 +192,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       labelStyle: TextStyle(color: Colors.indigo.shade700),
                       prefixIcon: const Icon(Icons.email_outlined, color: primaryIndigo),
                       filled: true,
-                      fillColor: Colors.indigo.shade50.withOpacity(0.4),
+                      fillColor: Colors.indigo.shade50.withValues(alpha: 0.4),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide(color: Colors.indigo.shade100, width: 1.5),
@@ -238,7 +238,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                       ),
                       filled: true,
-                      fillColor: Colors.indigo.shade50.withOpacity(0.4),
+                      fillColor: Colors.indigo.shade50.withValues(alpha: 0.4),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide(color: Colors.indigo.shade100, width: 1.5),
@@ -284,7 +284,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                       ),
                       filled: true,
-                      fillColor: Colors.indigo.shade50.withOpacity(0.4),
+                      fillColor: Colors.indigo.shade50.withValues(alpha: 0.4),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide(color: Colors.indigo.shade100, width: 1.5),
@@ -328,7 +328,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             foregroundColor: Colors.white,
                             disabledBackgroundColor: Colors.indigo.shade200,
                             elevation: 4,
-                            shadowColor: Colors.indigo.withOpacity(0.4),
+                            shadowColor: Colors.indigo.withValues(alpha: 0.4),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
