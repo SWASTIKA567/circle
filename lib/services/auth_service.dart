@@ -60,10 +60,12 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  // Register new user
+  // Register new user with student number and society member flag
   Future<bool> register({
     required String name,
+    required String studentNo,
     required String email,
+    required bool isSocietyMember,
     required String password,
   }) async {
     _clearError();
@@ -72,7 +74,9 @@ class AuthService with ChangeNotifier {
     try {
       final response = await ApiService.post('/auth/register', {
         'name': name.trim(),
+        'studentNo': studentNo.trim().toUpperCase(),
         'email': email.trim().toLowerCase(),
+        'isSocietyMember': isSocietyMember,
         'password': password,
       });
 
@@ -93,9 +97,9 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  // Login user
+  // Login user with Email or Student Number
   Future<bool> login({
-    required String email,
+    required String identifier,
     required String password,
   }) async {
     _clearError();
@@ -103,7 +107,7 @@ class AuthService with ChangeNotifier {
 
     try {
       final response = await ApiService.post('/auth/login', {
-        'email': email.trim().toLowerCase(),
+        'emailOrStudentNo': identifier.trim(),
         'password': password,
       });
 

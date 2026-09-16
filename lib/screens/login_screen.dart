@@ -14,13 +14,13 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _identifierController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _identifierController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -29,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final success = await widget.authService.login(
-      email: _emailController.text.trim(),
+      identifier: _identifierController.text.trim(),
       password: _passwordController.text,
     );
 
@@ -177,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Sign in to your account',
+                    'Sign in with Email or Student No.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
@@ -187,14 +187,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 36),
 
-                  // Email Field
+                  // Identifier Field (Email or Student Number)
                   TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
+                    controller: _identifierController,
+                    keyboardType: TextInputType.text,
                     decoration: InputDecoration(
-                      labelText: 'Email Address',
+                      labelText: 'Email or Student No.',
+                      hintText: 'user@example.com or STU-102',
                       labelStyle: TextStyle(color: Colors.indigo.shade700),
-                      prefixIcon: const Icon(Icons.email_outlined, color: primaryIndigo),
+                      prefixIcon: const Icon(Icons.account_circle_outlined, color: primaryIndigo),
                       filled: true,
                       fillColor: Colors.indigo.shade50.withValues(alpha: 0.4),
                       enabledBorder: OutlineInputBorder(
@@ -216,10 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     validator: (val) {
                       if (val == null || val.trim().isEmpty) {
-                        return 'Email is required';
-                      }
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val.trim())) {
-                        return 'Please enter a valid email address';
+                        return 'Please enter your email or student number';
                       }
                       return null;
                     },

@@ -17,6 +17,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = authService.currentUser;
     const primaryIndigo = Colors.indigo;
+    final isSocietyMember = user?.isSocietyMember ?? false;
 
     return Scaffold(
       backgroundColor: Colors.indigo.shade50.withValues(alpha: 0.35),
@@ -130,38 +131,70 @@ class HomeScreen extends StatelessWidget {
                         color: Colors.grey.shade600,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
-                    // Connected Status Chip
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.indigo.shade50,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.indigo.shade200),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
+                    // Badges Row (Society Member Badge + DB Status)
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        // Society Member Badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: isSocietyMember ? primaryIndigo : Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isSocietyMember ? primaryIndigo : Colors.grey.shade300,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Authenticated via Express & MongoDB',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: primaryIndigo,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isSocietyMember ? Icons.groups_rounded : Icons.person_outline,
+                                size: 16,
+                                color: isSocietyMember ? Colors.white : Colors.grey.shade700,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                isSocietyMember ? 'Society Member' : 'General Student',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isSocietyMember ? Colors.white : Colors.grey.shade700,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+
+                        // Connected Status Chip
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.indigo.shade50,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.indigo.shade200),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.check_circle, size: 14, color: Colors.green),
+                              SizedBox(width: 6),
+                              Text(
+                                'Express & MongoDB',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: primaryIndigo,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -181,7 +214,7 @@ class HomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Account Details',
+                      'Student Credentials',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -191,8 +224,8 @@ class HomeScreen extends StatelessWidget {
                     const Divider(height: 24),
                     _buildDetailRow(
                       icon: Icons.badge_outlined,
-                      label: 'Account ID',
-                      value: user?.id ?? 'N/A',
+                      label: 'Student Number',
+                      value: user?.studentNo.isNotEmpty == true ? user!.studentNo : 'N/A',
                     ),
                     const SizedBox(height: 14),
                     _buildDetailRow(
@@ -202,9 +235,15 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 14),
                     _buildDetailRow(
-                      icon: Icons.shield_outlined,
-                      label: 'Auth Provider',
-                      value: 'Node.js Express + JWT',
+                      icon: Icons.groups_outlined,
+                      label: 'Society Status',
+                      value: isSocietyMember ? 'Registered Society Member' : 'Not a Member',
+                    ),
+                    const SizedBox(height: 14),
+                    _buildDetailRow(
+                      icon: Icons.fingerprint_rounded,
+                      label: 'Account ID',
+                      value: user?.id ?? 'N/A',
                     ),
                   ],
                 ),

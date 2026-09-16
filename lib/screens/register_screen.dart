@@ -13,16 +13,19 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _studentNoController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  bool _isSocietyMember = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
     _nameController.dispose();
+    _studentNoController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -34,14 +37,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     final success = await widget.authService.register(
       name: _nameController.text.trim(),
+      studentNo: _studentNoController.text.trim(),
       email: _emailController.text.trim(),
+      isSocietyMember: _isSocietyMember,
       password: _passwordController.text,
     );
 
     if (!mounted) return;
 
     if (success) {
-      // Pop back so AuthWrapper switches to home or user lands on home
+      // Pop back to home screen
       Navigator.of(context).popUntil((route) => route.isFirst);
     } else if (widget.authService.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -119,7 +124,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
 
                   // Header Titles
                   const Text(
@@ -134,7 +139,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Join Circle and get started today',
+                    'Join Circle with your student credentials',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -142,7 +147,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 26),
 
                   // Full Name Field
                   TextFormField(
@@ -177,6 +182,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       }
                       if (val.trim().length < 2) {
                         return 'Name must be at least 2 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Student Number Field
+                  TextFormField(
+                    controller: _studentNoController,
+                    textCapitalization: TextCapitalization.characters,
+                    decoration: InputDecoration(
+                      labelText: 'Student No.',
+                      hintText: 'e.g. 2100320130001 or STU-102',
+                      labelStyle: TextStyle(color: Colors.indigo.shade700),
+                      prefixIcon: const Icon(Icons.badge_outlined, color: primaryIndigo),
+                      filled: true,
+                      fillColor: Colors.indigo.shade50.withValues(alpha: 0.4),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide(color: Colors.indigo.shade100, width: 1.5),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: primaryIndigo, width: 2),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide(color: Colors.red.shade300, width: 1.5),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide(color: Colors.red.shade600, width: 2),
+                      ),
+                    ),
+                    validator: (val) {
+                      if (val == null || val.trim().isEmpty) {
+                        return 'Student number is required';
+                      }
+                      if (val.trim().length < 3) {
+                        return 'Student number must be at least 3 characters';
                       }
                       return null;
                     },
@@ -219,6 +264,52 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       }
                       return null;
                     },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Society Member Toggle Card
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.indigo.shade50.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: _isSocietyMember ? primaryIndigo : Colors.indigo.shade100,
+                        width: _isSocietyMember ? 1.8 : 1.2,
+                      ),
+                    ),
+                    child: SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text(
+                        'Are you a society member?',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: primaryIndigo,
+                        ),
+                      ),
+                      subtitle: Text(
+                        _isSocietyMember ? 'Yes, I am a society member' : 'No, regular student',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: _isSocietyMember ? Colors.indigo.shade800 : Colors.grey.shade600,
+                          fontWeight: _isSocietyMember ? FontWeight.w500 : FontWeight.normal,
+                        ),
+                      ),
+                      secondary: Icon(
+                        _isSocietyMember ? Icons.groups_rounded : Icons.groups_outlined,
+                        color: primaryIndigo,
+                        size: 28,
+                      ),
+                      activeThumbColor: primaryIndigo,
+                      activeTrackColor: primaryIndigo.shade200,
+                      value: _isSocietyMember,
+                      onChanged: (bool val) {
+                        setState(() {
+                          _isSocietyMember = val;
+                        });
+                      },
+                    ),
                   ),
                   const SizedBox(height: 16),
 
@@ -312,7 +403,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 26),
 
                   // Sign Up Button
                   AnimatedBuilder(
