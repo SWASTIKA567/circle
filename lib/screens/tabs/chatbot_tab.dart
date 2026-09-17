@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../services/chatbot_service.dart';
 
 class ChatbotTab extends StatefulWidget {
   const ChatbotTab({super.key});
@@ -10,21 +11,24 @@ class ChatbotTab extends StatefulWidget {
 class _ChatbotTabState extends State<ChatbotTab> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  bool _isLoading = false;
 
   final List<Map<String, dynamic>> _messages = [
     {
       'isUser': false,
       'text':
-          'Hello! I am Circle AI, your campus assistant. How can I help you today with college notes, upcoming events, or campus societies?',
+          'Hello! I am Circle AI, powered by your campus ML assistant. Ask me anything about campus locations, amphitheatre, events, or college notes!',
       'time': 'Just now',
+      'matchedFacts': <String>[],
     },
   ];
 
   final List<String> _quickPrompts = [
+    'Where is the amphitheatre?',
+    'Where is the ATM?',
+    'College fest details',
     'Upcoming events this week?',
     'Best notes for DBMS?',
-    'How do I join Coding Club?',
-    'Exam schedule guidelines',
   ];
 
   @override
@@ -34,9 +38,11 @@ class _ChatbotTabState extends State<ChatbotTab> {
     super.dispose();
   }
 
-  void _sendMessage([String? promptText]) {
+  Future<void> _sendMessage([String? promptText]) async {
     final text = promptText ?? _messageController.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty || _isLoading) return;
+
+    _messageController.clear();
 
     setState(() {
       _messages.add({
@@ -44,40 +50,48 @@ class _ChatbotTabState extends State<ChatbotTab> {
         'text': text,
         'time': 'Just now',
       });
+      _isLoading = true;
     });
 
-    _messageController.clear();
     _scrollToBottom();
 
-    // Generate intelligent response after brief delay
-    Future.delayed(const Duration(milliseconds: 600), () {
-      if (!mounted) return;
-      String reply;
-      final lower = text.toLowerCase();
+    try {
+      final response = await ChatbotService.ask(text);
 
-      if (lower.contains('note') || lower.contains('dbms') || lower.contains('os')) {
-        reply =
-            'You can find top-rated semester notes in the Notes tab! We have handnotes for DBMS, OS, Data Structures, and Mathematics with download access.';
-      } else if (lower.contains('event') || lower.contains('hackathon')) {
-        reply =
-            'Check out the Events tab! Upcoming events include the Annual Hackathon 2026 and Tech Fest. You can RSVP directly in the app.';
-      } else if (lower.contains('society') || lower.contains('club')) {
-        reply =
-            'Explore the Societies tab to discover Technical, Cultural, and Sports clubs. If you are an active member, your profile displays a verified badge!';
-      } else {
-        reply =
-            'Got it! As your Circle campus assistant, I can help you find notes, navigate societies, or track event registrations. Feel free to ask anytime!';
-      }
+      if (!mounted) return;
 
       setState(() {
+        _isLoading = false;
         _messages.add({
           'isUser': false,
-          'text': reply,
+          'text': response.answer,
+          'matchedFacts': response.matchedFacts,
           'time': 'Just now',
         });
       });
-      _scrollToBottom();
-    });
+    } catch (e) {
+      if (!mounted) return;
+
+      String errorMsg = e.toString().replaceFirst('Exception: ', '');
+      if (errorMsg.contains('SocketException')) {
+        errorMsg = 'Could not reach server. Please check your internet connection.';
+      } else if (errorMsg.contains('TimeoutException')) {
+        errorMsg = 'Server took too long to respond. The free Render instance may be waking up, please try again in a moment.';
+      }
+
+      setState(() {
+        _isLoading = false;
+        _messages.add({
+          'isUser': false,
+          'text': errorMsg,
+          'matchedFacts': <String>[],
+          'isError': true,
+          'time': 'Just now',
+        });
+      });
+    }
+
+    _scrollToBottom();
   }
 
   void _scrollToBottom() {
@@ -129,7 +143,7 @@ class _ChatbotTabState extends State<ChatbotTab> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    onPressed: () => _sendMessage(prompt),
+                    onPressed: _isLoading ? null : () => _sendMessage(prompt),
                   );
                 },
               ),
@@ -141,10 +155,73 @@ class _ChatbotTabState extends State<ChatbotTab> {
             child: ListView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              itemCount: _messages.length,
+              itemCount: _messages.length + (_isLoading ? 1 : 0),
               itemBuilder: (context, index) {
+                // Render typing bubble when loading
+                if (index == _messages.length) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 14),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 16,
+                          backgroundColor: primaryIndigo,
+                          child: const Icon(
+                            Icons.auto_awesome,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.indigo.shade50.withValues(alpha: 0.6),
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(18),
+                              topRight: Radius.circular(18),
+                              bottomLeft: Radius.circular(4),
+                              bottomRight: Radius.circular(18),
+                            ),
+                            border: Border.all(color: Colors.indigo.shade100),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: primaryIndigo,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                'Circle AI is thinking...',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.indigo.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
                 final msg = _messages[index];
                 final isUser = msg['isUser'] as bool;
+                final isError = msg['isError'] as bool? ?? false;
+                final matchedFacts = msg['matchedFacts'] as List<String>? ?? [];
 
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 14),
@@ -156,9 +233,10 @@ class _ChatbotTabState extends State<ChatbotTab> {
                       if (!isUser) ...[
                         CircleAvatar(
                           radius: 16,
-                          backgroundColor: primaryIndigo,
-                          child: const Icon(
-                            Icons.auto_awesome,
+                          backgroundColor:
+                              isError ? Colors.red.shade400 : primaryIndigo,
+                          child: Icon(
+                            isError ? Icons.error_outline : Icons.auto_awesome,
                             color: Colors.white,
                             size: 16,
                           ),
@@ -166,37 +244,96 @@ class _ChatbotTabState extends State<ChatbotTab> {
                         const SizedBox(width: 8),
                       ],
                       Flexible(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isUser
-                                ? primaryIndigo
-                                : Colors.indigo.shade50.withValues(alpha: 0.6),
-                            borderRadius: BorderRadius.only(
-                              topLeft: const Radius.circular(18),
-                              topRight: const Radius.circular(18),
-                              bottomLeft: isUser
-                                  ? const Radius.circular(18)
-                                  : const Radius.circular(4),
-                              bottomRight: isUser
-                                  ? const Radius.circular(4)
-                                  : const Radius.circular(18),
+                        child: Column(
+                          crossAxisAlignment: isUser
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isUser
+                                    ? primaryIndigo
+                                    : isError
+                                        ? Colors.red.shade50
+                                        : Colors.indigo.shade50
+                                            .withValues(alpha: 0.6),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: const Radius.circular(18),
+                                  topRight: const Radius.circular(18),
+                                  bottomLeft: isUser
+                                      ? const Radius.circular(18)
+                                      : const Radius.circular(4),
+                                  bottomRight: isUser
+                                      ? const Radius.circular(4)
+                                      : const Radius.circular(18),
+                                ),
+                                border: isUser
+                                    ? null
+                                    : Border.all(
+                                        color: isError
+                                            ? Colors.red.shade200
+                                            : Colors.indigo.shade100,
+                                      ),
+                              ),
+                              child: Text(
+                                msg['text'] as String,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: isUser
+                                      ? Colors.white
+                                      : isError
+                                          ? Colors.red.shade900
+                                          : Colors.black87,
+                                  height: 1.4,
+                                ),
+                              ),
                             ),
-                            border: isUser
-                                ? null
-                                : Border.all(color: Colors.indigo.shade100),
-                          ),
-                          child: Text(
-                            msg['text'] as String,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: isUser ? Colors.white : Colors.black87,
-                              height: 1.4,
-                            ),
-                          ),
+                            if (!isUser && matchedFacts.isNotEmpty) ...[
+                              const SizedBox(height: 6),
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 4,
+                                children: matchedFacts.map((fact) {
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 3,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.indigo.shade50,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: Colors.indigo.shade200,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.tag,
+                                          size: 11,
+                                          color: Colors.indigo.shade600,
+                                        ),
+                                        const SizedBox(width: 2),
+                                        Text(
+                                          fact,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.indigo.shade800,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                       if (isUser) ...[
@@ -232,9 +369,12 @@ class _ChatbotTabState extends State<ChatbotTab> {
                   Expanded(
                     child: TextField(
                       controller: _messageController,
+                      enabled: !_isLoading,
                       onSubmitted: (_) => _sendMessage(),
                       decoration: InputDecoration(
-                        hintText: 'Ask Circle AI anything...',
+                        hintText: _isLoading
+                            ? 'Waiting for response...'
+                            : 'Ask Circle AI anything...',
                         hintStyle: TextStyle(
                           color: Colors.indigo.shade200,
                           fontSize: 14,
@@ -265,13 +405,13 @@ class _ChatbotTabState extends State<ChatbotTab> {
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    decoration: const BoxDecoration(
-                      color: primaryIndigo,
+                    decoration: BoxDecoration(
+                      color: _isLoading ? Colors.indigo.shade200 : primaryIndigo,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
                       icon: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
-                      onPressed: () => _sendMessage(),
+                      onPressed: _isLoading ? null : () => _sendMessage(),
                     ),
                   ),
                 ],
