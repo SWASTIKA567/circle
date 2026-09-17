@@ -21,44 +21,7 @@ class _EventsTabState extends State<EventsTab> {
     'Literary',
   ];
 
-  final List<Map<String, dynamic>> _events = [
-    {
-      'title': 'HackCircle 2026: 24h Hackathon',
-      'society': 'Google Developer Student Club',
-      'date': '28 SEP',
-      'time': '10:00 AM - Next Day',
-      'venue': 'Auditorium Hall B',
-      'type': 'Technical',
-      'isRsvp': false,
-    },
-    {
-      'title': 'AI & Robotics Workshop: Hands-on IoT',
-      'society': 'Robotics & Automation Society',
-      'date': '04 OCT',
-      'time': '02:00 PM - 05:00 PM',
-      'venue': 'Hardware Lab 3',
-      'type': 'Workshop',
-      'isRsvp': false,
-    },
-    {
-      'title': 'Symphony 2026: Annual Music Night',
-      'society': 'Cadence Music Society',
-      'date': '12 OCT',
-      'time': '06:00 PM - 09:30 PM',
-      'venue': 'Open Air Theatre (OAT)',
-      'type': 'Cultural',
-      'isRsvp': false,
-    },
-    {
-      'title': 'National Youth Parliamentary Debate',
-      'society': 'Orators Debating Society',
-      'date': '19 OCT',
-      'time': '11:00 AM - 04:00 PM',
-      'venue': 'Seminar Hall 1',
-      'type': 'Literary',
-      'isRsvp': false,
-    },
-  ];
+  final List<Map<String, dynamic>> _events = [];
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +166,42 @@ class _EventsTabState extends State<EventsTab> {
           const SizedBox(height: 12),
 
           // Events List
-          ...filteredEvents.map((event) {
+          if (filteredEvents.isEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 20),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.event_busy_outlined,
+                    size: 56,
+                    color: Colors.indigo.shade200,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    _selectedCategory == 'All'
+                        ? 'No upcoming events'
+                        : 'No events found in "$_selectedCategory"',
+                    style: TextStyle(
+                      color: Colors.grey.shade700,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Campus events and fests will appear here.',
+                    style: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            ...filteredEvents.map((event) {
             final isRsvp = event['isRsvp'] as bool;
             final dateParts = (event['date'] as String).split(' ');
 

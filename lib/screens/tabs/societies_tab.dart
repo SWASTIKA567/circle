@@ -21,53 +21,7 @@ class _SocietiesTabState extends State<SocietiesTab> {
     'Sports',
   ];
 
-  final List<Map<String, dynamic>> _societies = [
-    {
-      'name': 'Google Developer Student Club',
-      'category': 'Technical',
-      'members': '140+ Members',
-      'description':
-          'Fostering peer-to-peer learning in mobile, web, and cloud technologies.',
-      'icon': Icons.code_rounded,
-      'isJoined': true,
-    },
-    {
-      'name': 'Robotics & Automation Society',
-      'category': 'Technical',
-      'members': '95+ Members',
-      'description':
-          'Hands-on robotics hardware, IoT builds, and competitive bot challenges.',
-      'icon': Icons.precision_manufacturing_rounded,
-      'isJoined': false,
-    },
-    {
-      'name': 'Cadence Music & Bands',
-      'category': 'Cultural',
-      'members': '75+ Members',
-      'description':
-          'Vocalists, instrumentalists, and live performances across college fests.',
-      'icon': Icons.music_note_rounded,
-      'isJoined': false,
-    },
-    {
-      'name': 'Orators Debating Society',
-      'category': 'Literary',
-      'members': '50+ Members',
-      'description':
-          'Parliamentary debates, Model UN simulations, and public speaking workshops.',
-      'icon': Icons.record_voice_over_rounded,
-      'isJoined': false,
-    },
-    {
-      'name': 'Vanguard Sports Council',
-      'category': 'Sports',
-      'members': '120+ Members',
-      'description':
-          'Inter-college tournaments for football, cricket, basketball, and badminton.',
-      'icon': Icons.sports_soccer_rounded,
-      'isJoined': false,
-    },
-  ];
+  final List<Map<String, dynamic>> _societies = [];
 
   @override
   Widget build(BuildContext context) {
@@ -195,7 +149,42 @@ class _SocietiesTabState extends State<SocietiesTab> {
           const SizedBox(height: 16),
 
           // Societies List
-          ...filteredSocieties.map((soc) {
+          if (filteredSocieties.isEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 20),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.groups_outlined,
+                    size: 56,
+                    color: Colors.indigo.shade200,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    _selectedCategory == 'All'
+                        ? 'No societies listed yet'
+                        : 'No societies found in "$_selectedCategory"',
+                    style: TextStyle(
+                      color: Colors.grey.shade700,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Campus clubs and student societies will appear here.',
+                    style: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            ...filteredSocieties.map((soc) {
             return Container(
               margin: const EdgeInsets.only(bottom: 14),
               decoration: BoxDecoration(

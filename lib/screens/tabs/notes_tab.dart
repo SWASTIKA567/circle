@@ -20,48 +20,7 @@ class _NotesTabState extends State<NotesTab> {
     'Mathematics',
   ];
 
-  final List<Map<String, String>> _notes = [
-    {
-      'title': 'Data Structures & Algorithms Handnotes',
-      'subject': 'Data Structures',
-      'author': 'Prof. Sharma',
-      'semester': 'Sem 3',
-      'pages': '48 pages',
-      'rating': '4.9',
-    },
-    {
-      'title': 'Operating Systems Process Management',
-      'subject': 'OS',
-      'author': 'Rahul V. (Topper)',
-      'semester': 'Sem 4',
-      'pages': '32 pages',
-      'rating': '4.8',
-    },
-    {
-      'title': 'Computer Networks OSI & TCP/IP Model',
-      'subject': 'Networks',
-      'author': 'Dr. K. Verma',
-      'semester': 'Sem 5',
-      'pages': '56 pages',
-      'rating': '4.7',
-    },
-    {
-      'title': 'Discrete Mathematics & Graph Theory',
-      'subject': 'Mathematics',
-      'author': 'Dept. Faculty',
-      'semester': 'Sem 3',
-      'pages': '64 pages',
-      'rating': '4.9',
-    },
-    {
-      'title': 'DBMS Normalization & SQL Queries',
-      'subject': 'Computer Science',
-      'author': 'Ananya P.',
-      'semester': 'Sem 4',
-      'pages': '40 pages',
-      'rating': '4.6',
-    },
-  ];
+  final List<Map<String, String>> _notes = [];
 
   @override
   void dispose() {
@@ -182,8 +141,21 @@ class _NotesTabState extends State<NotesTab> {
                         Icon(Icons.menu_book_outlined, size: 56, color: Colors.indigo.shade200),
                         const SizedBox(height: 12),
                         Text(
-                          'No notes found for "$_selectedCategory"',
-                          style: TextStyle(color: Colors.grey.shade600, fontSize: 15),
+                          _searchController.text.trim().isNotEmpty
+                              ? 'No notes matching "${_searchController.text.trim()}"'
+                              : (_selectedCategory == 'All'
+                                  ? 'No notes uploaded yet'
+                                  : 'No notes found for "$_selectedCategory"'),
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Handnotes and PDFs will appear here once uploaded.',
+                          style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
                         ),
                       ],
                     ),
