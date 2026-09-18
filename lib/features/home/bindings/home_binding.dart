@@ -1,11 +1,11 @@
 import 'package:get/get.dart';
-import '../features/auth/controllers/auth_controller.dart';
-import '../features/auth/bindings/auth_binding.dart';
-import '../features/home/controllers/home_controller.dart';
-import '../features/events/controllers/events_controller.dart';
-import '../features/notes/controllers/notes_controller.dart';
-import '../features/societies/controllers/societies_controller.dart';
-import '../features/chatbot/controllers/chatbot_controller.dart';
+import '../../auth/controllers/auth_controller.dart';
+import '../../auth/bindings/auth_binding.dart';
+import '../controllers/home_controller.dart';
+import '../../events/controllers/events_controller.dart';
+import '../../notes/controllers/notes_controller.dart';
+import '../../societies/controllers/societies_controller.dart';
+import '../../chatbot/controllers/chatbot_controller.dart';
 
 class HomeBinding extends Bindings {
   @override

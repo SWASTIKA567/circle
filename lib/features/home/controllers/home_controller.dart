@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../features/auth/controllers/auth_controller.dart';
+import '../../auth/controllers/auth_controller.dart';
 
 class HomeController extends GetxController {
   final RxInt currentIndex = 0.obs;

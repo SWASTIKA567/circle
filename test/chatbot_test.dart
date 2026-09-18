@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:college_notes/services/chatbot_service.dart';
+import 'package:college_notes/features/chatbot/models/chatbot_response.dart';
 
 void main() {
   group('ChatbotResponse Model Tests', () {

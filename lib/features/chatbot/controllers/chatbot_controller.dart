@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import '../models/chatbot_response.dart';
 import '../services/chatbot_api_service.dart';
 
 class ChatMessage {

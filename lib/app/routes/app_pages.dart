@@ -8,6 +8,8 @@ import '../../features/auth/views/register_view.dart';
 import '../../features/home/bindings/home_binding.dart';
 import '../../features/home/views/home_view.dart';
 
+// ignore_for_file: constant_identifier_names
+
 class AppPages {
   static const INITIAL = Routes.SPLASH;
 

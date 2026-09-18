@@ -39,7 +39,7 @@ class ChatbotView extends GetView<ChatbotController> {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: controller.quickPrompts.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                separatorBuilder: (_, _) => const SizedBox(width: 8),
                 itemBuilder: (context, index) {
                   final prompt = controller.quickPrompts[index];
                   return ActionChip(
