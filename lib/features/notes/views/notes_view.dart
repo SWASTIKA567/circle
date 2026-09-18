@@ -253,6 +253,18 @@ class NotesView extends GetView<NotesController> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
+                    color: Colors.purple.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    note.unit,
+                    style: TextStyle(fontSize: 11, color: Colors.purple.shade700, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
                     color: Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -298,6 +310,7 @@ class NotesView extends GetView<NotesController> {
 
   void _showUploadBottomSheet(BuildContext context) {
     final titleController = TextEditingController();
+    final unitController = TextEditingController(text: 'Unit 1');
     final selectedSubject = 'Computer Science'.obs;
     final selectedSemester = 'Semester 1'.obs;
     final Rx<File?> pickedFile = Rx<File?>(null);
@@ -494,6 +507,62 @@ class NotesView extends GetView<NotesController> {
               ),
               const SizedBox(height: 14),
 
+              // Unit Name input
+              const Text(
+                'Unit Name',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black87),
+              ),
+              const SizedBox(height: 6),
+              TextField(
+                controller: unitController,
+                decoration: InputDecoration(
+                  hintText: 'e.g. Unit 1, Unit 2 - Process Scheduling',
+                  hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                  filled: true,
+                  fillColor: Colors.grey.shade50,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.indigo.shade100),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.indigo.shade100),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: primaryIndigo, width: 1.6),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Quick Unit selection chips
+              Wrap(
+                spacing: 8,
+                children: ['Unit 1', 'Unit 2', 'Unit 3', 'Unit 4', 'Unit 5'].map((u) {
+                  return InkWell(
+                    onTap: () {
+                      unitController.text = u;
+                    },
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.indigo.shade50.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: Colors.indigo.shade100),
+                      ),
+                      child: Text(
+                        u,
+                        style: const TextStyle(fontSize: 11, color: primaryIndigo, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 14),
+
               // Subject & Semester Row
               Row(
                 children: [
@@ -616,6 +685,7 @@ class NotesView extends GetView<NotesController> {
                             title: titleController.text.trim(),
                             subject: selectedSubject.value,
                             semester: selectedSemester.value,
+                            unit: unitController.text.trim().isEmpty ? 'Unit 1' : unitController.text.trim(),
                           );
 
                           if (success) {
