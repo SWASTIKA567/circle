@@ -170,4 +170,37 @@ class NotesController extends GetxController {
       );
     }
   }
+
+  Future<void> downloadNotePdf(NoteModel note) async {
+    final downloadUrl = ApiService.resolveFileUrl('/api/notes/download/${note.id}');
+    final uri = Uri.parse(downloadUrl);
+
+    try {
+      Get.snackbar(
+        'Downloading Note',
+        'Starting download for "${note.title}"...',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.indigo.shade50,
+        colorText: Colors.indigo.shade900,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+      );
+
+      final canLaunch = await canLaunchUrl(uri);
+      if (canLaunch) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        await launchUrl(uri);
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Download Error',
+        'Could not initiate download: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade50,
+        colorText: Colors.red.shade900,
+        margin: const EdgeInsets.all(16),
+      );
+    }
+  }
 }
