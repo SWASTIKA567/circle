@@ -12,8 +12,6 @@ class NotesView extends GetView<NotesController> {
 
   @override
   Widget build(BuildContext context) {
-    final searchController = TextEditingController();
-
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: Column(
@@ -34,20 +32,18 @@ class NotesView extends GetView<NotesController> {
             ),
             child: Column(
               children: [
+                // Modern Search Input
                 Obx(() => TextField(
-                  controller: searchController,
+                  controller: controller.searchController,
                   onChanged: controller.updateSearch,
                   decoration: InputDecoration(
-                    hintText: 'Search college notes, subjects...',
-                    hintStyle: TextStyle(color: Colors.indigo.shade200, fontSize: 14),
+                    hintText: 'Search by title, subject, unit, semester...',
+                    hintStyle: TextStyle(color: Colors.indigo.shade200, fontSize: 13.5),
                     prefixIcon: const Icon(Icons.search_rounded, color: primaryIndigo),
                     suffixIcon: controller.searchQuery.value.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear, color: Colors.grey),
-                            onPressed: () {
-                              searchController.clear();
-                              controller.updateSearch('');
-                            },
+                            icon: const Icon(Icons.clear_rounded, color: Colors.grey, size: 20),
+                            onPressed: controller.clearSearch,
                           )
                         : null,
                     filled: true,
@@ -67,42 +63,42 @@ class NotesView extends GetView<NotesController> {
                     ),
                   ),
                 )),
-                const SizedBox(height: 12),
 
-                // Category Chips
-                Obx(() => SizedBox(
-                  height: 36,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: controller.categories.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 8),
-                    itemBuilder: (context, index) {
-                      final cat = controller.categories[index];
-                      final isSelected = controller.selectedCategory.value == cat;
-                      return ChoiceChip(
-                        label: Text(cat),
-                        selected: isSelected,
-                        labelStyle: TextStyle(
-                          color: isSelected ? Colors.white : primaryIndigo,
-                          fontSize: 12,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                        ),
-                        selectedColor: primaryIndigo,
-                        backgroundColor: Colors.indigo.shade50.withValues(alpha: 0.4),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(
-                            color: isSelected ? primaryIndigo : Colors.indigo.shade100,
+                // Search Results Bar (when searching)
+                Obx(() {
+                  final isFiltered = controller.searchQuery.value.trim().isNotEmpty;
+                  if (!isFiltered) return const SizedBox.shrink();
+
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Row(
+                      children: [
+                        Icon(Icons.search_rounded, size: 16, color: Colors.indigo.shade400),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Found ${controller.filteredNotes.length} note${controller.filteredNotes.length == 1 ? '' : 's'}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.indigo.shade700,
                           ),
                         ),
-                        showCheckmark: false,
-                        onSelected: (selected) {
-                          if (selected) controller.selectCategory(cat);
-                        },
-                      );
-                    },
-                  ),
-                )),
+                        const Spacer(),
+                        InkWell(
+                          onTap: controller.clearSearch,
+                          child: const Text(
+                            'Clear search',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: primaryIndigo,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
               ],
             ),
           ),
@@ -141,16 +137,31 @@ class NotesView extends GetView<NotesController> {
                             Text(
                               controller.searchQuery.value.trim().isNotEmpty
                                   ? 'No notes matching "${controller.searchQuery.value.trim()}"'
-                                  : (controller.selectedCategory.value == 'All'
-                                      ? 'No notes uploaded yet'
-                                      : 'No notes found for "${controller.selectedCategory.value}"'),
+                                  : 'No notes uploaded yet',
                               style: TextStyle(color: Colors.grey.shade800, fontSize: 16, fontWeight: FontWeight.w700),
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              'Tap the "+ Upload Note" button below to upload a PDF.',
+                              controller.searchQuery.value.trim().isNotEmpty
+                                  ? 'Try checking for typos or searching by another keyword'
+                                  : 'Tap the "+ Upload Note" button below to upload a PDF.',
                               style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
                             ),
+                            if (controller.searchQuery.value.trim().isNotEmpty) ...[
+                              const SizedBox(height: 16),
+                              OutlinedButton.icon(
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: primaryIndigo,
+                                  side: const BorderSide(color: primaryIndigo),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.refresh_rounded, size: 16),
+                                label: const Text('Clear Search'),
+                                onPressed: controller.clearSearch,
+                              ),
+                            ],
                           ],
                         ),
                       ),

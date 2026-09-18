@@ -7,6 +7,7 @@ import '../../auth/controllers/auth_controller.dart';
 import '../models/note_model.dart';
 
 class NotesController extends GetxController {
+  final TextEditingController searchController = TextEditingController();
   final RxString selectedCategory = 'All'.obs;
   final RxString searchQuery = ''.obs;
   final RxList<NoteModel> notes = <NoteModel>[].obs;
@@ -30,6 +31,12 @@ class NotesController extends GetxController {
     fetchNotes();
   }
 
+  @override
+  void onClose() {
+    searchController.dispose();
+    super.onClose();
+  }
+
   List<NoteModel> get filteredNotes {
     return notes.where((note) {
       final matchesCategory =
@@ -41,6 +48,8 @@ class NotesController extends GetxController {
           note.title.toLowerCase().contains(query) ||
           note.subject.toLowerCase().contains(query) ||
           note.unit.toLowerCase().contains(query) ||
+          note.semester.toLowerCase().contains(query) ||
+          note.fileName.toLowerCase().contains(query) ||
           note.author.toLowerCase().contains(query);
 
       return matchesCategory && matchesQuery;
@@ -48,7 +57,13 @@ class NotesController extends GetxController {
   }
 
   void selectCategory(String category) => selectedCategory.value = category;
+
   void updateSearch(String query) => searchQuery.value = query;
+
+  void clearSearch() {
+    searchController.clear();
+    searchQuery.value = '';
+  }
 
   Future<void> fetchNotes() async {
     try {
