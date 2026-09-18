@@ -11,18 +11,28 @@ class SplashController extends GetxController {
   }
 
   Future<void> _initApp() async {
-    // Put AuthController early so it can be used throughout the app
-    if (!Get.isRegistered<AuthController>()) {
-      AuthBinding().dependencies();
-    }
-    final authController = Get.find<AuthController>();
-    final isLoggedIn = await authController.tryAutoLogin();
+    try {
+      // Initialize AuthController early if not yet registered
+      if (!Get.isRegistered<AuthController>()) {
+        AuthBinding().dependencies();
+      }
 
-    await Future.delayed(const Duration(milliseconds: 800));
+      final authController = Get.find<AuthController>();
 
-    if (isLoggedIn) {
-      Get.offAllNamed(Routes.HOME);
-    } else {
+      // Safe timeout for auto-login so splash NEVER hangs
+      final isLoggedIn = await authController
+          .tryAutoLogin()
+          .timeout(const Duration(seconds: 3), onTimeout: () => false);
+
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      if (isLoggedIn) {
+        Get.offAllNamed(Routes.HOME);
+      } else {
+        Get.offAllNamed(Routes.LOGIN);
+      }
+    } catch (_) {
+      // Guaranteed safety fallback to Login Screen
       Get.offAllNamed(Routes.LOGIN);
     }
   }

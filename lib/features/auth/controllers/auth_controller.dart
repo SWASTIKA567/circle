@@ -28,7 +28,8 @@ class AuthController extends GetxController {
       }
 
       try {
-        final response = await ApiService.get('/auth/me', token: token);
+        final response = await ApiService.get('/auth/me', token: token)
+            .timeout(const Duration(seconds: 3));
         if (response['success'] == true && response['user'] != null) {
           currentUser.value = UserModel.fromJson(response['user'], token: token);
           await _persistSession(token, currentUser.value!);
@@ -38,14 +39,19 @@ class AuthController extends GetxController {
       } catch (e) {
         final cachedUserStr = prefs.getString(_userKey);
         if (cachedUserStr != null) {
-          final userData = jsonDecode(cachedUserStr) as Map<String, dynamic>;
-          currentUser.value = UserModel.fromJson(userData, token: token);
-          isLoading.value = false;
-          return true;
+          try {
+            final userData = jsonDecode(cachedUserStr) as Map<String, dynamic>;
+            currentUser.value = UserModel.fromJson(userData, token: token);
+            isLoading.value = false;
+            return true;
+          } catch (_) {}
         }
       }
 
-      await logout(prompt: false);
+      // If token is invalid or server failed, clean up cached session silently
+      await prefs.remove(_tokenKey);
+      await prefs.remove(_userKey);
+      currentUser.value = null;
       isLoading.value = false;
       return false;
     } catch (_) {
