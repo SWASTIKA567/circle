@@ -33,19 +33,19 @@ class NotesView extends GetView<NotesController> {
             child: Column(
               children: [
                 // Modern Search Input
-                Obx(() => TextField(
+                TextField(
                   controller: controller.searchController,
                   onChanged: controller.updateSearch,
                   decoration: InputDecoration(
                     hintText: 'Search by title, subject, unit, semester...',
                     hintStyle: TextStyle(color: Colors.indigo.shade200, fontSize: 13.5),
                     prefixIcon: const Icon(Icons.search_rounded, color: primaryIndigo),
-                    suffixIcon: controller.searchQuery.value.isNotEmpty
+                    suffixIcon: Obx(() => controller.searchQuery.value.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear_rounded, color: Colors.grey, size: 20),
                             onPressed: controller.clearSearch,
                           )
-                        : null,
+                        : const SizedBox.shrink()),
                     filled: true,
                     fillColor: Colors.indigo.shade50.withValues(alpha: 0.35),
                     contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
@@ -62,7 +62,7 @@ class NotesView extends GetView<NotesController> {
                       borderSide: const BorderSide(color: primaryIndigo, width: 1.8),
                     ),
                   ),
-                )),
+                ),
 
                 // Search Results Bar (when searching)
                 Obx(() {

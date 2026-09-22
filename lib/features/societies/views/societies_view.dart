@@ -103,19 +103,19 @@ class SocietiesView extends GetView<SocietiesController> {
                 const SizedBox(height: 12),
 
                 // Search Bar
-                Obx(() => TextField(
+                TextField(
                   controller: controller.searchController,
                   onChanged: controller.updateSearch,
                   decoration: InputDecoration(
                     hintText: 'Search societies, domains, department...',
                     hintStyle: TextStyle(color: Colors.indigo.shade200, fontSize: 13.5),
                     prefixIcon: const Icon(Icons.search_rounded, color: primaryIndigo),
-                    suffixIcon: controller.searchQuery.value.isNotEmpty
+                    suffixIcon: Obx(() => controller.searchQuery.value.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear_rounded, color: Colors.grey, size: 20),
                             onPressed: controller.clearSearch,
                           )
-                        : null,
+                        : const SizedBox.shrink()),
                     filled: true,
                     fillColor: Colors.indigo.shade50.withValues(alpha: 0.35),
                     contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
@@ -132,43 +132,46 @@ class SocietiesView extends GetView<SocietiesController> {
                       borderSide: const BorderSide(color: primaryIndigo, width: 1.8),
                     ),
                   ),
-                )),
+                ),
                 const SizedBox(height: 10),
 
                 // Category Chips
-                Obx(() => SizedBox(
-                  height: 34,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: controller.categories.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 8),
-                    itemBuilder: (context, index) {
-                      final cat = controller.categories[index];
-                      final isSelected = controller.selectedCategory.value == cat;
-                      return ChoiceChip(
-                        label: Text(cat),
-                        selected: isSelected,
-                        labelStyle: TextStyle(
-                          color: isSelected ? Colors.white : primaryIndigo,
-                          fontSize: 12,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                        ),
-                        selectedColor: primaryIndigo,
-                        backgroundColor: Colors.indigo.shade50.withValues(alpha: 0.4),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          side: BorderSide(
-                            color: isSelected ? primaryIndigo : Colors.indigo.shade100,
+                Obx(() {
+                  final selected = controller.selectedCategory.value;
+                  return SizedBox(
+                    height: 34,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: controller.categories.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 8),
+                      itemBuilder: (context, index) {
+                        final cat = controller.categories[index];
+                        final isSelected = selected == cat;
+                        return ChoiceChip(
+                          label: Text(cat),
+                          selected: isSelected,
+                          labelStyle: TextStyle(
+                            color: isSelected ? Colors.white : primaryIndigo,
+                            fontSize: 12,
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                           ),
-                        ),
-                        showCheckmark: false,
-                        onSelected: (selected) {
-                          if (selected) controller.selectCategory(cat);
-                        },
-                      );
-                    },
-                  ),
-                )),
+                          selectedColor: primaryIndigo,
+                          backgroundColor: Colors.indigo.shade50.withValues(alpha: 0.4),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            side: BorderSide(
+                              color: isSelected ? primaryIndigo : Colors.indigo.shade100,
+                            ),
+                          ),
+                          showCheckmark: false,
+                          onSelected: (selectedVal) {
+                            if (selectedVal) controller.selectCategory(cat);
+                          },
+                        );
+                      },
+                    ),
+                  );
+                }),
               ],
             ),
           ),
