@@ -50,6 +50,8 @@ class SocietyModel {
   final List<SocietyEventModel> recentEvents;
   final List<SocietyEventModel> upcomingEvents;
   final String category;
+  final String status;
+  final bool isApproved;
   final String createdByName;
   final DateTime? createdAt;
 
@@ -65,6 +67,8 @@ class SocietyModel {
     this.recentEvents = const [],
     this.upcomingEvents = const [],
     this.category = 'Technical',
+    this.status = 'pending',
+    this.isApproved = false,
     this.createdByName = 'Society Member',
     this.createdAt,
   });
@@ -89,6 +93,9 @@ class SocietyModel {
           .toList();
     }
 
+    final statusVal = json['status'] ?? (json['isApproved'] == true ? 'approved' : 'pending');
+    final isApprovedVal = json['isApproved'] == true || statusVal == 'approved';
+
     return SocietyModel(
       id: json['_id'] ?? json['id'] ?? '',
       name: json['name'] ?? '',
@@ -101,6 +108,8 @@ class SocietyModel {
       recentEvents: parsedRecent,
       upcomingEvents: parsedUpcoming,
       category: json['category'] ?? 'Technical',
+      status: statusVal,
+      isApproved: isApprovedVal,
       createdByName: json['createdByName'] ?? 'Society Member',
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
@@ -121,6 +130,8 @@ class SocietyModel {
       'recentEvents': recentEvents.map((e) => e.toJson()).toList(),
       'upcomingEvents': upcomingEvents.map((e) => e.toJson()).toList(),
       'category': category,
+      'status': status,
+      'isApproved': isApproved,
       'createdByName': createdByName,
       if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
     };

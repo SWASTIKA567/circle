@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../app/routes/app_routes.dart';
 import '../controllers/home_controller.dart';
 import '../../events/views/events_view.dart';
 import '../../notes/views/notes_view.dart';
@@ -13,6 +14,7 @@ class HomeView extends GetView<HomeController> {
     final user = controller.authController.currentUser.value;
     const primaryIndigo = Colors.indigo;
     final isSocietyMember = user?.isSocietyMember ?? false;
+    final isAdmin = user?.isAdmin == true || user?.role == 'admin';
 
     Get.bottomSheet(
       SafeArea(
@@ -36,7 +38,7 @@ class HomeView extends GetView<HomeController> {
               const SizedBox(height: 18),
               CircleAvatar(
                 radius: 36,
-                backgroundColor: primaryIndigo,
+                backgroundColor: isAdmin ? Colors.amber.shade700 : primaryIndigo,
                 child: Text(
                   controller.getInitials(user?.name ?? 'User'),
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
@@ -53,15 +55,28 @@ class HomeView extends GetView<HomeController> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                 decoration: BoxDecoration(
-                  color: isSocietyMember ? primaryIndigo : Colors.indigo.shade50,
+                  color: isAdmin
+                      ? Colors.amber.shade50
+                      : isSocietyMember
+                          ? primaryIndigo
+                          : Colors.indigo.shade50,
                   borderRadius: BorderRadius.circular(16),
+                  border: isAdmin ? Border.all(color: Colors.amber.shade300) : null,
                 ),
                 child: Text(
-                  isSocietyMember ? '★ Verified Society Member' : 'General Student',
+                  isAdmin
+                      ? '⭐ System Administrator'
+                      : isSocietyMember
+                          ? '★ Verified Society Member'
+                          : 'General Student',
                   style: TextStyle(
                     fontSize: 12,
-                    color: isSocietyMember ? Colors.white : primaryIndigo,
-                    fontWeight: FontWeight.w600,
+                    color: isAdmin
+                        ? Colors.amber.shade900
+                        : isSocietyMember
+                            ? Colors.white
+                            : primaryIndigo,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -69,7 +84,7 @@ class HomeView extends GetView<HomeController> {
               const Divider(),
               ListTile(
                 leading: const Icon(Icons.badge_outlined, color: primaryIndigo),
-                title: const Text('Student Number', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                title: const Text('Student / Admin ID', style: TextStyle(fontSize: 13, color: Colors.grey)),
                 subtitle: Text(
                   user?.studentNo.isNotEmpty == true ? user!.studentNo : 'N/A',
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
@@ -77,12 +92,33 @@ class HomeView extends GetView<HomeController> {
               ),
               ListTile(
                 leading: const Icon(Icons.shield_outlined, color: primaryIndigo),
-                title: const Text('Auth Backend', style: TextStyle(fontSize: 13, color: Colors.grey)),
-                subtitle: const Text(
-                  'Node.js Express + MongoDB Atlas',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
+                title: const Text('Account Role', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                subtitle: Text(
+                  isAdmin ? 'Administrator (Full Review & Manage Rights)' : 'Student User',
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
                 ),
               ),
+              if (isAdmin) ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryIndigo,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 0,
+                    ),
+                    icon: const Icon(Icons.admin_panel_settings_rounded, size: 20),
+                    label: const Text('Open Admin Panel', style: TextStyle(fontWeight: FontWeight.bold)),
+                    onPressed: () {
+                      Get.back();
+                      Get.toNamed(Routes.ADMIN);
+                    },
+                  ),
+                ),
+              ],
               const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
@@ -170,6 +206,18 @@ class HomeView extends GetView<HomeController> {
           ],
         )),
         actions: [
+          // Admin quick button (VISIBLE ONLY FOR ADMINS)
+          Obx(() {
+            final user = controller.authController.currentUser.value;
+            final isAdmin = user?.isAdmin == true || user?.role == 'admin';
+            if (!isAdmin) return const SizedBox.shrink();
+
+            return IconButton(
+              icon: const Icon(Icons.admin_panel_settings_rounded, color: Colors.amberAccent),
+              tooltip: 'Admin Management Panel',
+              onPressed: () => Get.toNamed(Routes.ADMIN),
+            );
+          }),
           Padding(
             padding: const EdgeInsets.only(right: 14.0),
             child: GestureDetector(

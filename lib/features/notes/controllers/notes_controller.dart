@@ -122,16 +122,18 @@ class NotesController extends GetxController {
 
       if (response['success'] == true && response['note'] != null) {
         final newNote = NoteModel.fromJson(response['note']);
-        notes.insert(0, newNote);
+        if (newNote.isApproved) {
+          notes.insert(0, newNote);
+        }
 
         Get.snackbar(
-          'Upload Successful',
-          '"${newNote.title}" has been uploaded successfully.',
+          'Submitted for Approval 📋',
+          response['message'] ?? '"${newNote.title}" uploaded! It will be visible after Admin approval.',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.indigo.shade50,
           colorText: Colors.indigo.shade900,
           margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 4),
         );
         return true;
       } else {

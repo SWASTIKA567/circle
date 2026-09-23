@@ -9,6 +9,8 @@ class NoteModel {
   final String fileUrl;
   final int fileSize;
   final String pages;
+  final String status;
+  final bool isApproved;
   final DateTime? createdAt;
 
   NoteModel({
@@ -22,10 +24,15 @@ class NoteModel {
     required this.fileUrl,
     required this.fileSize,
     required this.pages,
+    this.status = 'pending',
+    this.isApproved = false,
     this.createdAt,
   });
 
   factory NoteModel.fromJson(Map<String, dynamic> json) {
+    final statusVal = json['status'] ?? (json['isApproved'] == true ? 'approved' : 'pending');
+    final isApprovedVal = json['isApproved'] == true || statusVal == 'approved';
+
     return NoteModel(
       id: json['_id'] ?? json['id'] ?? '',
       title: json['title'] ?? 'Untitled Note',
@@ -37,6 +44,8 @@ class NoteModel {
       fileUrl: json['fileUrl'] ?? '',
       fileSize: json['fileSize'] ?? 0,
       pages: json['pages'] ?? 'PDF',
+      status: statusVal,
+      isApproved: isApprovedVal,
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
           : null,
@@ -55,6 +64,8 @@ class NoteModel {
       'fileUrl': fileUrl,
       'fileSize': fileSize,
       'pages': pages,
+      'status': status,
+      'isApproved': isApproved,
       if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
     };
   }

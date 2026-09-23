@@ -148,6 +148,37 @@ class ApiService {
     }
   }
 
+  static Future<Map<String, dynamic>> delete(
+    String endpoint, {
+    String? token,
+  }) async {
+    try {
+      final uri = Uri.parse('$baseUrl$endpoint');
+      final response = await http
+          .delete(
+            uri,
+            headers: _headers(token: token),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return data;
+      } else {
+        final message = data['message'] ?? 'Request failed (${response.statusCode})';
+        throw Exception(message);
+      }
+    } on SocketException {
+      throw Exception(
+        'Unable to connect to backend server. Make sure the Node.js backend is running on port 5000.',
+      );
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception(e.toString());
+    }
+  }
+
   static Future<Map<String, dynamic>> uploadFile(
     String endpoint, {
     required File file,

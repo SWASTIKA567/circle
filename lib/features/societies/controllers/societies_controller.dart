@@ -124,16 +124,18 @@ class SocietiesController extends GetxController {
 
       if (response['success'] == true && response['society'] != null) {
         final newSociety = SocietyModel.fromJson(response['society']);
-        societies.insert(0, newSociety);
+        if (newSociety.isApproved) {
+          societies.insert(0, newSociety);
+        }
 
         Get.snackbar(
-          'Society Created!',
-          '"${newSociety.name}" has been registered successfully.',
+          'Submitted for Approval 📋',
+          response['message'] ?? '"${newSociety.name}" registered! It will be visible after Admin approval.',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.indigo.shade50,
           colorText: Colors.indigo.shade900,
           margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 4),
         );
         return true;
       } else {
