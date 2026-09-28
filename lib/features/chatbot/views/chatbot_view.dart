@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../app/theme/app_theme.dart';
 import '../controllers/chatbot_controller.dart';
 
 class ChatbotView extends GetView<ChatbotController> {
@@ -7,7 +8,6 @@ class ChatbotView extends GetView<ChatbotController> {
 
   @override
   Widget build(BuildContext context) {
-    const primaryIndigo = Colors.indigo;
     final messageController = TextEditingController();
     final scrollController = ScrollController();
 
@@ -24,15 +24,15 @@ class ChatbotView extends GetView<ChatbotController> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: Column(
         children: [
           // Quick Prompts Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.indigo.shade50.withValues(alpha: 0.4),
-              border: Border(bottom: BorderSide(color: Colors.indigo.shade100)),
+              color: AppColors.white,
+              border: Border(bottom: BorderSide(color: AppColors.grayFade(0.12))),
             ),
             child: SizedBox(
               height: 34,
@@ -47,12 +47,12 @@ class ChatbotView extends GetView<ChatbotController> {
                       prompt,
                       style: const TextStyle(
                         fontSize: 12,
-                        color: primaryIndigo,
+                        color: AppColors.card,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    backgroundColor: Colors.white,
-                    side: BorderSide(color: Colors.indigo.shade200),
+                    backgroundColor: AppColors.purpleLight,
+                    side: BorderSide(color: AppColors.purple.withValues(alpha: 0.3)),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     onPressed: controller.isLoading.value
                         ? null
@@ -85,21 +85,21 @@ class ChatbotView extends GetView<ChatbotController> {
                         children: [
                           const CircleAvatar(
                             radius: 16,
-                            backgroundColor: primaryIndigo,
-                            child: Icon(Icons.auto_awesome, color: Colors.white, size: 16),
+                            backgroundColor: AppColors.card,
+                            child: Icon(Icons.auto_awesome, color: AppColors.purple, size: 16),
                           ),
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Colors.indigo.shade50.withValues(alpha: 0.6),
+                              color: AppColors.white,
                               borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(18),
                                 topRight: Radius.circular(18),
                                 bottomLeft: Radius.circular(4),
                                 bottomRight: Radius.circular(18),
                               ),
-                              border: Border.all(color: Colors.indigo.shade100),
+                              border: Border.all(color: AppColors.grayFade(0.12)),
                             ),
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
@@ -109,7 +109,7 @@ class ChatbotView extends GetView<ChatbotController> {
                                   height: 14,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: primaryIndigo,
+                                    color: AppColors.purple,
                                   ),
                                 ),
                                 SizedBox(width: 10),
@@ -118,7 +118,7 @@ class ChatbotView extends GetView<ChatbotController> {
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontStyle: FontStyle.italic,
-                                    color: Colors.indigo,
+                                    color: AppColors.gray,
                                   ),
                                 ),
                               ],
@@ -143,10 +143,10 @@ class ChatbotView extends GetView<ChatbotController> {
                         if (!isUser) ...[
                           CircleAvatar(
                             radius: 16,
-                            backgroundColor: isError ? Colors.red.shade400 : primaryIndigo,
+                            backgroundColor: isError ? AppColors.pink : AppColors.card,
                             child: Icon(
                               isError ? Icons.error_outline : Icons.auto_awesome,
-                              color: Colors.white,
+                              color: isError ? AppColors.white : AppColors.purple,
                               size: 16,
                             ),
                           ),
@@ -160,10 +160,10 @@ class ChatbotView extends GetView<ChatbotController> {
                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                 decoration: BoxDecoration(
                                   color: isUser
-                                      ? primaryIndigo
+                                      ? AppColors.card
                                       : isError
-                                          ? Colors.red.shade50
-                                          : Colors.indigo.shade50.withValues(alpha: 0.6),
+                                          ? AppColors.pinkLight
+                                          : AppColors.white,
                                   borderRadius: BorderRadius.only(
                                     topLeft: const Radius.circular(18),
                                     topRight: const Radius.circular(18),
@@ -173,18 +173,25 @@ class ChatbotView extends GetView<ChatbotController> {
                                   border: isUser
                                       ? null
                                       : Border.all(
-                                          color: isError ? Colors.red.shade200 : Colors.indigo.shade100,
+                                          color: isError ? AppColors.pink : AppColors.grayFade(0.12),
                                         ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.black.withValues(alpha: 0.02),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
                                 child: Text(
                                   msg.text,
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isUser
-                                        ? Colors.white
+                                        ? AppColors.white
                                         : isError
-                                            ? Colors.red.shade900
-                                            : Colors.black87,
+                                            ? AppColors.magenta
+                                            : AppColors.text,
                                     height: 1.4,
                                   ),
                                 ),
@@ -198,21 +205,21 @@ class ChatbotView extends GetView<ChatbotController> {
                                     return Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                       decoration: BoxDecoration(
-                                        color: Colors.indigo.shade50,
+                                        color: AppColors.blueLight,
                                         borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.indigo.shade200),
+                                        border: Border.all(color: AppColors.blue.withValues(alpha: 0.3)),
                                       ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(Icons.tag, size: 11, color: Colors.indigo.shade600),
+                                          const Icon(Icons.tag, size: 11, color: AppColors.card),
                                           const SizedBox(width: 2),
                                           Text(
                                             fact,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               fontSize: 11,
                                               fontWeight: FontWeight.w600,
-                                              color: Colors.indigo.shade800,
+                                              color: AppColors.card,
                                             ),
                                           ),
                                         ],
@@ -226,10 +233,10 @@ class ChatbotView extends GetView<ChatbotController> {
                         ),
                         if (isUser) ...[
                           const SizedBox(width: 8),
-                          CircleAvatar(
+                          const CircleAvatar(
                             radius: 16,
-                            backgroundColor: Colors.indigo.shade100,
-                            child: const Icon(Icons.person, color: primaryIndigo, size: 18),
+                            backgroundColor: AppColors.purpleLight,
+                            child: Icon(Icons.person, color: AppColors.card, size: 18),
                           ),
                         ],
                       ],
@@ -244,8 +251,8 @@ class ChatbotView extends GetView<ChatbotController> {
           Container(
             padding: const EdgeInsets.fromLTRB(14, 8, 14, 14),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.indigo.shade100)),
+              color: AppColors.white,
+              border: Border(top: BorderSide(color: AppColors.grayFade(0.12))),
             ),
             child: SafeArea(
               top: false,
@@ -255,6 +262,7 @@ class ChatbotView extends GetView<ChatbotController> {
                     child: Obx(() => TextField(
                       controller: messageController,
                       enabled: !controller.isLoading.value,
+                      style: const TextStyle(fontSize: 14, color: AppColors.text),
                       onSubmitted: (val) {
                         if (val.trim().isNotEmpty) {
                           controller.sendMessage(val.trim());
@@ -264,21 +272,21 @@ class ChatbotView extends GetView<ChatbotController> {
                       },
                       decoration: InputDecoration(
                         hintText: controller.isLoading.value ? 'Waiting for response...' : 'Ask Circle AI anything...',
-                        hintStyle: TextStyle(color: Colors.indigo.shade200, fontSize: 14),
+                        hintStyle: const TextStyle(color: AppColors.gray, fontSize: 14),
                         filled: true,
-                        fillColor: Colors.indigo.shade50.withValues(alpha: 0.4),
+                        fillColor: AppColors.background,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide(color: Colors.indigo.shade100),
+                          borderSide: BorderSide(color: AppColors.grayFade(0.15)),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide(color: Colors.indigo.shade100),
+                          borderSide: BorderSide(color: AppColors.grayFade(0.15)),
                         ),
                         focusedBorder: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(24)),
-                          borderSide: BorderSide(color: primaryIndigo, width: 1.8),
+                          borderSide: BorderSide(color: AppColors.purple, width: 1.8),
                         ),
                       ),
                     )),
@@ -286,11 +294,11 @@ class ChatbotView extends GetView<ChatbotController> {
                   const SizedBox(width: 8),
                   Obx(() => Container(
                     decoration: BoxDecoration(
-                      color: controller.isLoading.value ? Colors.indigo.shade200 : primaryIndigo,
+                      color: controller.isLoading.value ? AppColors.grayFade(0.3) : AppColors.card,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
-                      icon: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                      icon: const Icon(Icons.send_rounded, color: AppColors.purple, size: 20),
                       onPressed: controller.isLoading.value
                           ? null
                           : () {

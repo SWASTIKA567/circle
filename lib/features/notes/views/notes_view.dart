@@ -2,29 +2,28 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../app/theme/app_theme.dart';
 import '../controllers/notes_controller.dart';
 import '../models/note_model.dart';
 
 class NotesView extends GetView<NotesController> {
   const NotesView({super.key});
 
-  static const primaryIndigo = Colors.indigo;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: Column(
         children: [
           // Search & Filters Header
           Container(
-            padding: const EdgeInsets.fromLTRB(18, 14, 18, 10),
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(bottom: BorderSide(color: Colors.indigo.shade50)),
+              color: AppColors.white,
+              border: Border(bottom: BorderSide(color: AppColors.grayFade(0.12))),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
+                  color: AppColors.black.withValues(alpha: 0.02),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -32,34 +31,35 @@ class NotesView extends GetView<NotesController> {
             ),
             child: Column(
               children: [
-                // Modern Search Input
+                // Modern Minimal Search Input
                 TextField(
                   controller: controller.searchController,
                   onChanged: controller.updateSearch,
+                  style: const TextStyle(fontSize: 14, color: AppColors.text),
                   decoration: InputDecoration(
                     hintText: 'Search by title, subject, unit, semester...',
-                    hintStyle: TextStyle(color: Colors.indigo.shade200, fontSize: 13.5),
-                    prefixIcon: const Icon(Icons.search_rounded, color: primaryIndigo),
+                    hintStyle: const TextStyle(color: AppColors.gray, fontSize: 13),
+                    prefixIcon: const Icon(Icons.search_rounded, color: AppColors.gray),
                     suffixIcon: Obx(() => controller.searchQuery.value.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, color: Colors.grey, size: 20),
+                            icon: const Icon(Icons.clear_rounded, color: AppColors.gray, size: 20),
                             onPressed: controller.clearSearch,
                           )
                         : const SizedBox.shrink()),
                     filled: true,
-                    fillColor: Colors.indigo.shade50.withValues(alpha: 0.35),
+                    fillColor: AppColors.background,
                     contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: Colors.indigo.shade100),
+                      borderSide: BorderSide(color: AppColors.grayFade(0.15)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: Colors.indigo.shade100),
+                      borderSide: BorderSide(color: AppColors.grayFade(0.15)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(color: primaryIndigo, width: 1.8),
+                      borderSide: const BorderSide(color: AppColors.purple, width: 1.8),
                     ),
                   ),
                 ),
@@ -73,14 +73,14 @@ class NotesView extends GetView<NotesController> {
                     padding: const EdgeInsets.only(top: 10),
                     child: Row(
                       children: [
-                        Icon(Icons.search_rounded, size: 16, color: Colors.indigo.shade400),
+                        const Icon(Icons.search_rounded, size: 16, color: AppColors.gray),
                         const SizedBox(width: 6),
                         Text(
                           'Found ${controller.filteredNotes.length} note${controller.filteredNotes.length == 1 ? '' : 's'}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Colors.indigo.shade700,
+                            color: AppColors.text,
                           ),
                         ),
                         const Spacer(),
@@ -90,8 +90,9 @@ class NotesView extends GetView<NotesController> {
                             'Clear search',
                             style: TextStyle(
                               fontSize: 12,
-                              color: primaryIndigo,
-                              fontWeight: FontWeight.w700,
+                              color: AppColors.card,
+                              fontWeight: FontWeight.w800,
+                              decoration: TextDecoration.underline,
                             ),
                           ),
                         ),
@@ -108,14 +109,14 @@ class NotesView extends GetView<NotesController> {
             child: Obx(() {
               if (controller.isLoading.value) {
                 return const Center(
-                  child: CircularProgressIndicator(color: primaryIndigo),
+                  child: CircularProgressIndicator(color: AppColors.purple),
                 );
               }
 
               final filteredNotes = controller.filteredNotes;
               if (filteredNotes.isEmpty) {
                 return RefreshIndicator(
-                  color: primaryIndigo,
+                  color: AppColors.card,
                   onRefresh: controller.fetchNotes,
                   child: ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -127,34 +128,32 @@ class NotesView extends GetView<NotesController> {
                           children: [
                             Container(
                               padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.indigo.shade50,
+                              decoration: const BoxDecoration(
+                                color: AppColors.white,
                                 shape: BoxShape.circle,
                               ),
-                              child: Icon(Icons.picture_as_pdf_outlined, size: 52, color: primaryIndigo.shade400),
+                              child: const Icon(Icons.picture_as_pdf_outlined, size: 52, color: AppColors.gray),
                             ),
                             const SizedBox(height: 16),
                             Text(
                               controller.searchQuery.value.trim().isNotEmpty
                                   ? 'No notes matching "${controller.searchQuery.value.trim()}"'
                                   : 'No notes uploaded yet',
-                              style: TextStyle(color: Colors.grey.shade800, fontSize: 16, fontWeight: FontWeight.w700),
+                              style: const TextStyle(color: AppColors.text, fontSize: 16, fontWeight: FontWeight.w700),
                             ),
                             const SizedBox(height: 6),
-                            Text(
-                              controller.searchQuery.value.trim().isNotEmpty
-                                  ? 'Try checking for typos or searching by another keyword'
-                                  : 'Tap the "+ Upload Note" button below to upload a PDF.',
-                              style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+                            const Text(
+                              'Tap "+ Upload Note" below to add PDF course materials.',
+                              style: TextStyle(color: AppColors.gray, fontSize: 13),
                             ),
                             if (controller.searchQuery.value.trim().isNotEmpty) ...[
                               const SizedBox(height: 16),
                               OutlinedButton.icon(
                                 style: OutlinedButton.styleFrom(
-                                  foregroundColor: primaryIndigo,
-                                  side: const BorderSide(color: primaryIndigo),
+                                  foregroundColor: AppColors.card,
+                                  side: const BorderSide(color: AppColors.card),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
                                 icon: const Icon(Icons.refresh_rounded, size: 16),
@@ -171,7 +170,7 @@ class NotesView extends GetView<NotesController> {
               }
 
               return RefreshIndicator(
-                color: primaryIndigo,
+                color: AppColors.card,
                 onRefresh: controller.fetchNotes,
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
@@ -187,10 +186,10 @@ class NotesView extends GetView<NotesController> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: primaryIndigo,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.upload_file_rounded),
-        label: const Text('Upload Note', style: TextStyle(fontWeight: FontWeight.w600)),
+        backgroundColor: AppColors.card,
+        foregroundColor: AppColors.white,
+        icon: const Icon(Icons.upload_file_rounded, color: AppColors.purple),
+        label: const Text('Upload Note', style: TextStyle(fontWeight: FontWeight.w700)),
         onPressed: () => _showUploadBottomSheet(context),
       ),
     );
@@ -200,14 +199,14 @@ class NotesView extends GetView<NotesController> {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.indigo.shade100),
+        border: Border.all(color: AppColors.grayFade(0.12)),
         boxShadow: [
           BoxShadow(
-            color: Colors.indigo.withValues(alpha: 0.04),
+            color: AppColors.black.withValues(alpha: 0.03),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -222,10 +221,10 @@ class NotesView extends GetView<NotesController> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.red.shade50,
+                    color: AppColors.pinkLight,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(Icons.picture_as_pdf_rounded, color: Colors.red.shade700, size: 28),
+                  child: const Icon(Icons.picture_as_pdf_rounded, color: AppColors.magenta, size: 28),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -234,12 +233,12 @@ class NotesView extends GetView<NotesController> {
                     children: [
                       Text(
                         note.title,
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.black87),
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.text),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'By ${note.author} • ${note.pages}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                        style: const TextStyle(fontSize: 12, color: AppColors.gray),
                       ),
                     ],
                   ),
@@ -252,45 +251,45 @@ class NotesView extends GetView<NotesController> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.indigo.shade50,
+                    color: AppColors.blueLight,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     note.subject,
-                    style: const TextStyle(fontSize: 11, color: primaryIndigo, fontWeight: FontWeight.w600),
+                    style: const TextStyle(fontSize: 11, color: AppColors.text, fontWeight: FontWeight.w700),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.purple.shade50,
+                    color: AppColors.purpleLight,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     note.unit,
-                    style: TextStyle(fontSize: 11, color: Colors.purple.shade700, fontWeight: FontWeight.w600),
+                    style: const TextStyle(fontSize: 11, color: AppColors.card, fontWeight: FontWeight.w700),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: AppColors.background,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     note.semester,
-                    style: TextStyle(fontSize: 11, color: Colors.grey.shade800, fontWeight: FontWeight.w500),
+                    style: const TextStyle(fontSize: 11, color: AppColors.gray, fontWeight: FontWeight.w600),
                   ),
                 ),
                 const Spacer(),
                 OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: primaryIndigo,
-                    side: const BorderSide(color: primaryIndigo),
+                    foregroundColor: AppColors.card,
+                    side: BorderSide(color: AppColors.grayFade(0.3)),
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     visualDensity: VisualDensity.compact,
                   ),
                   icon: const Icon(Icons.visibility_rounded, size: 15),
@@ -300,11 +299,11 @@ class NotesView extends GetView<NotesController> {
                 const SizedBox(width: 8),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryIndigo,
-                    foregroundColor: Colors.white,
+                    backgroundColor: AppColors.card,
+                    foregroundColor: AppColors.white,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     visualDensity: VisualDensity.compact,
                   ),
                   icon: const Icon(Icons.download_rounded, size: 15),
@@ -355,7 +354,7 @@ class NotesView extends GetView<NotesController> {
         ),
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: SingleChildScrollView(
@@ -363,13 +362,12 @@ class NotesView extends GetView<NotesController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header & Drag handle
               Center(
                 child: Container(
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: AppColors.grayFade(0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -380,15 +378,15 @@ class NotesView extends GetView<NotesController> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.indigo.shade50,
+                      color: AppColors.card,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.upload_file_rounded, color: primaryIndigo),
+                    child: const Icon(Icons.upload_file_rounded, color: AppColors.purple, size: 20),
                   ),
                   const SizedBox(width: 12),
                   const Text(
                     'Upload Note (PDF)',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.black87),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.text),
                   ),
                 ],
               ),
@@ -421,8 +419,8 @@ class NotesView extends GetView<NotesController> {
                         'File Picker Error',
                         'Failed to pick PDF file: $e',
                         snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: Colors.red.shade50,
-                        colorText: Colors.red.shade900,
+                        backgroundColor: AppColors.pinkLight,
+                        colorText: AppColors.magenta,
                       );
                     }
                   },
@@ -431,12 +429,11 @@ class NotesView extends GetView<NotesController> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: hasFile ? Colors.indigo.shade50.withValues(alpha: 0.3) : Colors.grey.shade50,
+                      color: hasFile ? AppColors.purpleLight.withValues(alpha: 0.3) : AppColors.background,
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                        color: hasFile ? primaryIndigo : Colors.indigo.shade200,
+                        color: hasFile ? AppColors.card : AppColors.grayFade(0.2),
                         width: hasFile ? 1.8 : 1.2,
-                        style: BorderStyle.solid,
                       ),
                     ),
                     child: Row(
@@ -444,12 +441,12 @@ class NotesView extends GetView<NotesController> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: hasFile ? Colors.red.shade50 : Colors.indigo.shade50,
+                            color: hasFile ? AppColors.pinkLight : AppColors.white,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Icon(
                             hasFile ? Icons.picture_as_pdf_rounded : Icons.add_circle_outline_rounded,
-                            color: hasFile ? Colors.red.shade700 : primaryIndigo,
+                            color: hasFile ? AppColors.magenta : AppColors.card,
                             size: 26,
                           ),
                         ),
@@ -465,20 +462,20 @@ class NotesView extends GetView<NotesController> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: hasFile ? FontWeight.w700 : FontWeight.w600,
-                                  color: hasFile ? Colors.black87 : primaryIndigo,
+                                  color: hasFile ? AppColors.text : AppColors.card,
                                 ),
                               ),
                               const SizedBox(height: 2),
-                              Text(
-                                hasFile ? 'Size: ${pickedFileSize.value}' : 'Supports standard PDF files up to 50MB',
-                                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                              const Text(
+                                'Supports standard PDF files up to 50MB',
+                                style: TextStyle(fontSize: 12, color: AppColors.gray),
                               ),
                             ],
                           ),
                         ),
                         if (hasFile)
                           IconButton(
-                            icon: const Icon(Icons.change_circle_outlined, color: primaryIndigo),
+                            icon: const Icon(Icons.change_circle_outlined, color: AppColors.card),
                             onPressed: () => pickedFile.value = null,
                           ),
                       ],
@@ -491,28 +488,29 @@ class NotesView extends GetView<NotesController> {
               // Title input
               const Text(
                 'Note Title',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black87),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.text),
               ),
               const SizedBox(height: 6),
               TextField(
                 controller: titleController,
+                style: const TextStyle(fontSize: 14, color: AppColors.text),
                 decoration: InputDecoration(
                   hintText: 'e.g. Operating Systems Chapter 3 Notes',
-                  hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                  hintStyle: const TextStyle(color: AppColors.gray, fontSize: 13),
                   filled: true,
-                  fillColor: Colors.grey.shade50,
+                  fillColor: AppColors.background,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.indigo.shade100),
+                    borderSide: BorderSide(color: AppColors.grayFade(0.2)),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.indigo.shade100),
+                    borderSide: BorderSide(color: AppColors.grayFade(0.2)),
                   ),
-                  focusedBorder: OutlineInputBorder(
+                  focusedBorder: const OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: primaryIndigo, width: 1.6),
+                    borderSide: BorderSide(color: AppColors.purple, width: 1.6),
                   ),
                 ),
               ),
@@ -521,28 +519,29 @@ class NotesView extends GetView<NotesController> {
               // Unit Name input
               const Text(
                 'Unit Name',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black87),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.text),
               ),
               const SizedBox(height: 6),
               TextField(
                 controller: unitController,
+                style: const TextStyle(fontSize: 14, color: AppColors.text),
                 decoration: InputDecoration(
                   hintText: 'e.g. Unit 1, Unit 2 - Process Scheduling',
-                  hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                  hintStyle: const TextStyle(color: AppColors.gray, fontSize: 13),
                   filled: true,
-                  fillColor: Colors.grey.shade50,
+                  fillColor: AppColors.background,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.indigo.shade100),
+                    borderSide: BorderSide(color: AppColors.grayFade(0.2)),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.indigo.shade100),
+                    borderSide: BorderSide(color: AppColors.grayFade(0.2)),
                   ),
-                  focusedBorder: OutlineInputBorder(
+                  focusedBorder: const OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: primaryIndigo, width: 1.6),
+                    borderSide: BorderSide(color: AppColors.purple, width: 1.6),
                   ),
                 ),
               ),
@@ -558,15 +557,15 @@ class NotesView extends GetView<NotesController> {
                     },
                     borderRadius: BorderRadius.circular(14),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: Colors.indigo.shade50.withValues(alpha: 0.6),
+                        color: AppColors.purpleLight,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: Colors.indigo.shade100),
+                        border: Border.all(color: AppColors.purple.withValues(alpha: 0.4)),
                       ),
                       child: Text(
                         u,
-                        style: const TextStyle(fontSize: 11, color: primaryIndigo, fontWeight: FontWeight.w600),
+                        style: const TextStyle(fontSize: 11, color: AppColors.card, fontWeight: FontWeight.w700),
                       ),
                     ),
                   );
@@ -577,22 +576,21 @@ class NotesView extends GetView<NotesController> {
               // Subject & Semester Row
               Row(
                 children: [
-                  // Subject dropdown
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
                           'Subject',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black87),
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.text),
                         ),
                         const SizedBox(height: 6),
                         Obx(() => Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
+                            color: AppColors.background,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.indigo.shade100),
+                            border: Border.all(color: AppColors.grayFade(0.2)),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
@@ -601,7 +599,7 @@ class NotesView extends GetView<NotesController> {
                               items: subjects
                                   .map((s) => DropdownMenuItem(
                                         value: s,
-                                        child: Text(s, style: const TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis),
+                                        child: Text(s, style: const TextStyle(fontSize: 13, color: AppColors.text), overflow: TextOverflow.ellipsis),
                                       ))
                                   .toList(),
                               onChanged: (val) {
@@ -614,23 +612,21 @@ class NotesView extends GetView<NotesController> {
                     ),
                   ),
                   const SizedBox(width: 12),
-
-                  // Semester dropdown
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
                           'Semester',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black87),
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.text),
                         ),
                         const SizedBox(height: 6),
                         Obx(() => Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
+                            color: AppColors.background,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.indigo.shade100),
+                            border: Border.all(color: AppColors.grayFade(0.2)),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
@@ -639,7 +635,7 @@ class NotesView extends GetView<NotesController> {
                               items: semesters
                                   .map((sem) => DropdownMenuItem(
                                         value: sem,
-                                        child: Text(sem, style: const TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis),
+                                        child: Text(sem, style: const TextStyle(fontSize: 13, color: AppColors.text), overflow: TextOverflow.ellipsis),
                                       ))
                                   .toList(),
                               onChanged: (val) {
@@ -661,9 +657,9 @@ class NotesView extends GetView<NotesController> {
                 height: 48,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryIndigo,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    backgroundColor: AppColors.card,
+                    foregroundColor: AppColors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     elevation: 0,
                   ),
                   onPressed: controller.isUploading.value
@@ -674,8 +670,8 @@ class NotesView extends GetView<NotesController> {
                               'File Required',
                               'Please select a PDF file to upload.',
                               snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.amber.shade50,
-                              colorText: Colors.amber.shade900,
+                              backgroundColor: AppColors.pinkLight,
+                              colorText: AppColors.magenta,
                             );
                             return;
                           }
@@ -685,8 +681,8 @@ class NotesView extends GetView<NotesController> {
                               'Title Required',
                               'Please enter a title for the note.',
                               snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.amber.shade50,
-                              colorText: Colors.amber.shade900,
+                              backgroundColor: AppColors.pinkLight,
+                              colorText: AppColors.magenta,
                             );
                             return;
                           }
@@ -700,7 +696,7 @@ class NotesView extends GetView<NotesController> {
                           );
 
                           if (success) {
-                            Get.back(); // Close bottom sheet
+                            Get.back();
                           }
                         },
                   child: controller.isUploading.value
@@ -708,14 +704,14 @@ class NotesView extends GetView<NotesController> {
                           width: 22,
                           height: 22,
                           child: CircularProgressIndicator(
-                            color: Colors.white,
+                            color: AppColors.purple,
                             strokeWidth: 2.5,
                           ),
                         )
                       : const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.cloud_upload_rounded, size: 20),
+                            Icon(Icons.cloud_upload_rounded, size: 20, color: AppColors.purple),
                             SizedBox(width: 8),
                             Text('Upload Note', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
                           ],

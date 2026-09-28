@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
+import '../../../app/theme/app_theme.dart';
 import '../controllers/auth_controller.dart';
 
 class RegisterView extends StatefulWidget {
@@ -53,15 +54,13 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
-    const primaryIndigo = Colors.indigo;
-
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: primaryIndigo),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.text, size: 20),
           onPressed: () => Get.back(),
         ),
       ),
@@ -80,24 +79,20 @@ class _RegisterViewState extends State<RegisterView> {
                       width: 76,
                       height: 76,
                       decoration: BoxDecoration(
+                        color: AppColors.card,
                         shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [Colors.indigo.shade400, Colors.indigo.shade800],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.indigo.withValues(alpha: 0.3),
-                            blurRadius: 16,
-                            offset: const Offset(0, 8),
+                            color: AppColors.black.withValues(alpha: 0.12),
+                            blurRadius: 18,
+                            offset: const Offset(0, 6),
                           ),
                         ],
                       ),
                       child: const Center(
                         child: Icon(
                           Icons.person_add_alt_1_rounded,
-                          color: Colors.white,
+                          color: AppColors.purple,
                           size: 38,
                         ),
                       ),
@@ -110,17 +105,17 @@ class _RegisterViewState extends State<RegisterView> {
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
-                      color: primaryIndigo,
+                      color: AppColors.text,
                       letterSpacing: 0.8,
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text(
+                  const Text(
                     'Join Circle with your student credentials',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.indigo.shade300,
+                      color: AppColors.gray,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -168,33 +163,33 @@ class _RegisterViewState extends State<RegisterView> {
                   Obx(() => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.indigo.shade50.withValues(alpha: 0.5),
+                      color: _isSocietyMember.value ? AppColors.purpleLight : AppColors.white,
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                        color: _isSocietyMember.value ? primaryIndigo : Colors.indigo.shade100,
-                        width: _isSocietyMember.value ? 1.8 : 1.2,
+                        color: _isSocietyMember.value ? AppColors.purple : AppColors.grayFade(0.2),
+                        width: _isSocietyMember.value ? 1.6 : 1.0,
                       ),
                     ),
                     child: SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       title: const Text(
                         'Are you a society member?',
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: primaryIndigo),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.text),
                       ),
                       subtitle: Text(
                         _isSocietyMember.value ? 'Yes, I am a society member' : 'No, regular student',
                         style: TextStyle(
                           fontSize: 12,
-                          color: _isSocietyMember.value ? Colors.indigo.shade800 : Colors.grey.shade600,
+                          color: _isSocietyMember.value ? AppColors.text : AppColors.gray,
                         ),
                       ),
                       secondary: Icon(
                         _isSocietyMember.value ? Icons.groups_rounded : Icons.groups_outlined,
-                        color: primaryIndigo,
-                        size: 28,
+                        color: _isSocietyMember.value ? AppColors.card : AppColors.gray,
+                        size: 26,
                       ),
-                      activeThumbColor: primaryIndigo,
-                      activeTrackColor: Colors.indigo.shade200,
+                      activeColor: AppColors.purple,
+                      activeTrackColor: AppColors.card,
                       value: _isSocietyMember.value,
                       onChanged: (val) => _isSocietyMember.value = val,
                     ),
@@ -229,27 +224,26 @@ class _RegisterViewState extends State<RegisterView> {
                   Obx(() {
                     final isLoading = authController.isLoading.value;
                     return SizedBox(
-                      height: 54,
+                      height: 52,
                       child: ElevatedButton(
                         onPressed: isLoading ? null : _handleRegister,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryIndigo,
-                          foregroundColor: Colors.white,
-                          disabledBackgroundColor: Colors.indigo.shade200,
-                          elevation: 4,
-                          shadowColor: Colors.indigo.withValues(alpha: 0.4),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          backgroundColor: AppColors.card,
+                          foregroundColor: AppColors.white,
+                          disabledBackgroundColor: AppColors.grayFade(0.3),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
                         child: isLoading
                             ? const SizedBox(
-                                width: 24,
-                                height: 24,
+                                width: 22,
+                                height: 22,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2.5,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.purple),
                                 ),
                               )
-                            : const Text('Sign Up', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                            : const Text('Sign Up', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     );
                   }),
@@ -257,12 +251,17 @@ class _RegisterViewState extends State<RegisterView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Already have an account? ', style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
+                      const Text('Already have an account? ', style: TextStyle(color: AppColors.gray, fontSize: 14)),
                       GestureDetector(
                         onTap: () => Get.toNamed(Routes.LOGIN),
                         child: const Text(
                           'Sign In',
-                          style: TextStyle(color: primaryIndigo, fontWeight: FontWeight.bold, fontSize: 14),
+                          style: TextStyle(
+                            color: AppColors.text,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                       ),
                     ],
@@ -286,33 +285,33 @@ class _RegisterViewState extends State<RegisterView> {
     TextCapitalization capitalization = TextCapitalization.none,
     String? Function(String?)? validator,
   }) {
-    const primaryIndigo = Colors.indigo;
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       textCapitalization: capitalization,
+      style: const TextStyle(color: AppColors.text, fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        labelStyle: TextStyle(color: Colors.indigo.shade700),
-        prefixIcon: Icon(icon, color: primaryIndigo),
+        labelStyle: const TextStyle(color: AppColors.gray),
+        prefixIcon: Icon(icon, color: AppColors.gray),
         filled: true,
-        fillColor: Colors.indigo.shade50.withValues(alpha: 0.4),
+        fillColor: AppColors.white,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.indigo.shade100, width: 1.5),
+          borderSide: BorderSide(color: AppColors.grayFade(0.2), width: 1.2),
         ),
         focusedBorder: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(14)),
-          borderSide: BorderSide(color: primaryIndigo, width: 2),
+          borderSide: BorderSide(color: AppColors.purple, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.red.shade300, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.pink, width: 1.5),
         ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.red.shade600, width: 2),
+        focusedErrorBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(14)),
+          borderSide: BorderSide(color: AppColors.magenta, width: 2),
         ),
       ),
       validator: validator,
@@ -327,38 +326,38 @@ class _RegisterViewState extends State<RegisterView> {
     required VoidCallback onToggle,
     String? Function(String?)? validator,
   }) {
-    const primaryIndigo = Colors.indigo;
     return TextFormField(
       controller: controller,
       obscureText: obscure,
+      style: const TextStyle(color: AppColors.text, fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.indigo.shade700),
-        prefixIcon: Icon(icon, color: primaryIndigo),
+        labelStyle: const TextStyle(color: AppColors.gray),
+        prefixIcon: Icon(icon, color: AppColors.gray),
         suffixIcon: IconButton(
           icon: Icon(
             obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-            color: Colors.indigo.shade400,
+            color: AppColors.gray,
           ),
           onPressed: onToggle,
         ),
         filled: true,
-        fillColor: Colors.indigo.shade50.withValues(alpha: 0.4),
+        fillColor: AppColors.white,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.indigo.shade100, width: 1.5),
+          borderSide: BorderSide(color: AppColors.grayFade(0.2), width: 1.2),
         ),
         focusedBorder: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(14)),
-          borderSide: BorderSide(color: primaryIndigo, width: 2),
+          borderSide: BorderSide(color: AppColors.purple, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.red.shade300, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.pink, width: 1.5),
         ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.red.shade600, width: 2),
+        focusedErrorBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(14)),
+          borderSide: BorderSide(color: AppColors.magenta, width: 2),
         ),
       ),
       validator: validator,

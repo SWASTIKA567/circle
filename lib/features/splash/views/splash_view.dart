@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../app/theme/app_theme.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashView extends GetView<SplashController> {
@@ -9,46 +10,55 @@ class SplashView extends GetView<SplashController> {
   Widget build(BuildContext context) {
     controller; // Ensures controller instantiation
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 80,
-              height: 80,
+              width: 84,
+              height: 84,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.indigo,
+                color: AppColors.card,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.indigo.withValues(alpha: 0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
+                    color: AppColors.black.withValues(alpha: 0.15),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),
               child: const Center(
-                child: Icon(Icons.all_inclusive_rounded, color: Colors.white, size: 44),
+                child: Icon(Icons.all_inclusive_rounded, color: AppColors.purple, size: 46),
               ),
             ),
             const SizedBox(height: 24),
             const Text(
               'Circle',
               style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                color: Colors.indigo,
+                fontSize: 28,
+                fontWeight: FontWeight.w800,
+                color: AppColors.text,
                 letterSpacing: 1.2,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 6),
+            const Text(
+              'Campus Notes & Community',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: AppColors.gray,
+              ),
+            ),
+            const SizedBox(height: 32),
             const SizedBox(
-              width: 28,
-              height: 28,
+              width: 26,
+              height: 26,
               child: CircularProgressIndicator(
                 strokeWidth: 2.5,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.indigo),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.purple),
               ),
             ),
           ],

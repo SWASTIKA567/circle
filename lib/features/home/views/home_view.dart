@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
+import '../../../app/theme/app_theme.dart';
 import '../controllers/home_controller.dart';
 import '../../events/views/events_view.dart';
 import '../../notes/views/notes_view.dart';
@@ -12,7 +13,6 @@ class HomeView extends GetView<HomeController> {
 
   void _showProfileModal(BuildContext context) {
     final user = controller.authController.currentUser.value;
-    const primaryIndigo = Colors.indigo;
     final isSocietyMember = user?.isSocietyMember ?? false;
     final isAdmin = user?.isAdmin == true || user?.role == 'admin';
 
@@ -20,7 +20,7 @@ class HomeView extends GetView<HomeController> {
       SafeArea(
         child: Container(
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -31,37 +31,40 @@ class HomeView extends GetView<HomeController> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: AppColors.grayFade(0.3),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
               const SizedBox(height: 18),
               CircleAvatar(
                 radius: 36,
-                backgroundColor: isAdmin ? Colors.amber.shade700 : primaryIndigo,
+                backgroundColor: isAdmin ? AppColors.card : AppColors.purpleLight,
                 child: Text(
                   controller.getInitials(user?.name ?? 'User'),
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: isAdmin ? AppColors.purple : AppColors.card,
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
               Text(
                 user?.name ?? 'Circle User',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.text),
               ),
               const SizedBox(height: 2),
-              Text(user?.email ?? '', style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
+              Text(user?.email ?? '', style: const TextStyle(fontSize: 13, color: AppColors.gray)),
               const SizedBox(height: 14),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 decoration: BoxDecoration(
                   color: isAdmin
-                      ? Colors.amber.shade50
+                      ? AppColors.card
                       : isSocietyMember
-                          ? primaryIndigo
-                          : Colors.indigo.shade50,
+                          ? AppColors.purpleLight
+                          : AppColors.blueLight,
                   borderRadius: BorderRadius.circular(16),
-                  border: isAdmin ? Border.all(color: Colors.amber.shade300) : null,
                 ),
                 child: Text(
                   isAdmin
@@ -72,30 +75,30 @@ class HomeView extends GetView<HomeController> {
                   style: TextStyle(
                     fontSize: 12,
                     color: isAdmin
-                        ? Colors.amber.shade900
+                        ? AppColors.green
                         : isSocietyMember
-                            ? Colors.white
-                            : primaryIndigo,
+                            ? AppColors.card
+                            : AppColors.text,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
               const SizedBox(height: 18),
-              const Divider(),
+              Divider(color: AppColors.grayFade(0.15)),
               ListTile(
-                leading: const Icon(Icons.badge_outlined, color: primaryIndigo),
-                title: const Text('Student / Admin ID', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                leading: const Icon(Icons.badge_outlined, color: AppColors.card),
+                title: const Text('Student / Admin ID', style: TextStyle(fontSize: 12, color: AppColors.gray)),
                 subtitle: Text(
                   user?.studentNo.isNotEmpty == true ? user!.studentNo : 'N/A',
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.text),
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.shield_outlined, color: primaryIndigo),
-                title: const Text('Account Role', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                leading: const Icon(Icons.shield_outlined, color: AppColors.card),
+                title: const Text('Account Role', style: TextStyle(fontSize: 12, color: AppColors.gray)),
                 subtitle: Text(
                   isAdmin ? 'Administrator (Full Review & Manage Rights)' : 'Student User',
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.text),
                 ),
               ),
               if (isAdmin) ...[
@@ -105,12 +108,12 @@ class HomeView extends GetView<HomeController> {
                   height: 48,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryIndigo,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      backgroundColor: AppColors.card,
+                      foregroundColor: AppColors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       elevation: 0,
                     ),
-                    icon: const Icon(Icons.admin_panel_settings_rounded, size: 20),
+                    icon: const Icon(Icons.admin_panel_settings_rounded, size: 20, color: AppColors.purple),
                     label: const Text('Open Admin Panel', style: TextStyle(fontWeight: FontWeight.bold)),
                     onPressed: () {
                       Get.back();
@@ -125,22 +128,27 @@ class HomeView extends GetView<HomeController> {
                 height: 48,
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red.shade700,
-                    side: BorderSide(color: Colors.red.shade300),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    foregroundColor: AppColors.pink,
+                    side: BorderSide(color: AppColors.pink.withValues(alpha: 0.6)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
-                  icon: const Icon(Icons.logout_rounded, size: 20),
-                  label: const Text('Sign Out', style: TextStyle(fontWeight: FontWeight.bold)),
+                  icon: const Icon(Icons.logout_rounded, size: 20, color: AppColors.pink),
+                  label: const Text('Sign Out', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.text)),
                   onPressed: () {
                     Get.back();
                     Get.dialog(
                       AlertDialog(
-                        title: const Text('Sign Out', style: TextStyle(color: primaryIndigo, fontWeight: FontWeight.bold)),
+                        backgroundColor: AppColors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        title: const Text('Sign Out', style: TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
                         content: const Text('Are you sure you want to sign out of Circle?'),
                         actions: [
-                          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+                          TextButton(
+                            onPressed: () => Get.back(),
+                            child: const Text('Cancel', style: TextStyle(color: AppColors.gray)),
+                          ),
                           ElevatedButton(
-                            style: ElevatedButton.styleFrom(backgroundColor: primaryIndigo, foregroundColor: Colors.white),
+                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.card, foregroundColor: AppColors.white),
                             onPressed: () {
                               Get.back();
                               controller.authController.logout();
@@ -163,8 +171,6 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    const primaryIndigo = Colors.indigo;
-
     final tabs = const [
       EventsView(),
       NotesView(),
@@ -173,22 +179,22 @@ class HomeView extends GetView<HomeController> {
     ];
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: primaryIndigo,
+        backgroundColor: AppColors.card,
         elevation: 0,
         title: Obx(() => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Row(
               children: [
-                Icon(Icons.all_inclusive_rounded, color: Colors.white, size: 20),
+                Icon(Icons.all_inclusive_rounded, color: AppColors.purple, size: 20),
                 SizedBox(width: 6),
                 Text(
                   'Circle',
                   style: TextStyle(
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontSize: 18,
                     letterSpacing: 0.8,
                   ),
@@ -199,7 +205,7 @@ class HomeView extends GetView<HomeController> {
               controller.tabTitles[controller.currentIndex.value],
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.indigo.shade100,
+                color: AppColors.white.withValues(alpha: 0.6),
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -213,7 +219,7 @@ class HomeView extends GetView<HomeController> {
             if (!isAdmin) return const SizedBox.shrink();
 
             return IconButton(
-              icon: const Icon(Icons.admin_panel_settings_rounded, color: Colors.amberAccent),
+              icon: const Icon(Icons.admin_panel_settings_rounded, color: AppColors.green),
               tooltip: 'Admin Management Panel',
               onPressed: () => Get.toNamed(Routes.ADMIN),
             );
@@ -226,10 +232,10 @@ class HomeView extends GetView<HomeController> {
                 final user = controller.authController.currentUser.value;
                 return CircleAvatar(
                   radius: 18,
-                  backgroundColor: Colors.white,
+                  backgroundColor: AppColors.white,
                   child: Text(
                     controller.getInitials(user?.name ?? 'User'),
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: primaryIndigo),
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.card),
                   ),
                 );
               }),
@@ -243,40 +249,40 @@ class HomeView extends GetView<HomeController> {
       )),
       bottomNavigationBar: Obx(() => Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.indigo.withValues(alpha: 0.08),
+              color: AppColors.black.withValues(alpha: 0.05),
               blurRadius: 16,
               offset: const Offset(0, -4),
             ),
           ],
-          border: Border(top: BorderSide(color: Colors.indigo.shade50)),
+          border: Border(top: BorderSide(color: AppColors.grayFade(0.12))),
         ),
         child: NavigationBar(
           selectedIndex: controller.currentIndex.value,
           onDestinationSelected: (index) => controller.currentIndex.value = index,
-          backgroundColor: Colors.white,
-          indicatorColor: Colors.indigo.shade100,
+          backgroundColor: AppColors.white,
+          indicatorColor: AppColors.purpleLight,
           destinations: const [
             NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home_rounded, color: primaryIndigo),
+              icon: Icon(Icons.home_outlined, color: AppColors.gray),
+              selectedIcon: Icon(Icons.home_rounded, color: AppColors.card),
               label: 'Home',
             ),
             NavigationDestination(
-              icon: Icon(Icons.menu_book_outlined),
-              selectedIcon: Icon(Icons.menu_book_rounded, color: primaryIndigo),
+              icon: Icon(Icons.menu_book_outlined, color: AppColors.gray),
+              selectedIcon: Icon(Icons.menu_book_rounded, color: AppColors.card),
               label: 'Notes',
             ),
             NavigationDestination(
-              icon: Icon(Icons.smart_toy_outlined),
-              selectedIcon: Icon(Icons.smart_toy_rounded, color: primaryIndigo),
+              icon: Icon(Icons.smart_toy_outlined, color: AppColors.gray),
+              selectedIcon: Icon(Icons.smart_toy_rounded, color: AppColors.card),
               label: 'Chatbot',
             ),
             NavigationDestination(
-              icon: Icon(Icons.groups_outlined),
-              selectedIcon: Icon(Icons.groups_rounded, color: primaryIndigo),
+              icon: Icon(Icons.groups_outlined, color: AppColors.gray),
+              selectedIcon: Icon(Icons.groups_rounded, color: AppColors.card),
               label: 'Societies',
             ),
           ],
