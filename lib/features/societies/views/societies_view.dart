@@ -34,58 +34,50 @@ class SocietiesView extends GetView<SocietiesController> {
             ),
             child: Column(
               children: [
-                // Member Status Card
+                // Member Status Card (Only visible to verified society members)
                 Obx(() {
                   final user = authController.currentUser.value;
                   final isSocietyMember = user?.isSocietyMember ?? false;
+                  if (!isSocietyMember) return const SizedBox.shrink();
 
                   return Container(
+                    margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
-                      color: isSocietyMember ? AppColors.card : AppColors.background,
+                      color: AppColors.card,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: isSocietyMember ? AppColors.card : AppColors.grayFade(0.18),
-                      ),
+                      border: Border.all(color: AppColors.card),
                     ),
                     child: Row(
                       children: [
-                        CircleAvatar(
+                        const CircleAvatar(
                           radius: 20,
-                          backgroundColor: isSocietyMember
-                              ? AppColors.purpleLight
-                              : AppColors.white,
+                          backgroundColor: AppColors.purpleLight,
                           child: Icon(
-                            isSocietyMember ? Icons.verified_rounded : Icons.groups_rounded,
-                            color: isSocietyMember ? AppColors.card : AppColors.gray,
+                            Icons.verified_rounded,
+                            color: AppColors.card,
                             size: 22,
                           ),
                         ),
                         const SizedBox(width: 12),
-                        Expanded(
+                        const Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                isSocietyMember
-                                    ? 'Verified Society Member'
-                                    : 'Campus Societies & Clubs',
+                                'Verified Society Member',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  color: isSocietyMember ? AppColors.white : AppColors.text,
+                                  color: AppColors.white,
                                 ),
                               ),
-                              const SizedBox(height: 2),
+                              SizedBox(height: 2),
                               Text(
-                                isSocietyMember
-                                    ? 'You can create and manage your society with password.'
-                                    : 'Explore societies, events, and recruitment links.',
+                                'You can create and manage societies with your credentials.',
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: isSocietyMember
-                                      ? AppColors.white.withValues(alpha: 0.7)
-                                      : AppColors.gray,
+                                  color: AppColors.white,
                                 ),
                               ),
                             ],
@@ -95,7 +87,6 @@ class SocietiesView extends GetView<SocietiesController> {
                     ),
                   );
                 }),
-                const SizedBox(height: 12),
 
                 // Search Bar
                 TextField(
@@ -129,42 +120,112 @@ class SocietiesView extends GetView<SocietiesController> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
 
-                // Category Chips
+                // Sandwich Bar Category Filter Row
+                Row(
+                  children: [
+                    Obx(() {
+                      final count = controller.filteredSocieties.length;
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.grayFade(0.15)),
+                        ),
+                        child: Text(
+                          '$count Societ${count == 1 ? 'y' : 'ies'}',
+                          style: const TextStyle(fontSize: 11, color: AppColors.gray, fontWeight: FontWeight.w600),
+                        ),
+                      );
+                    }),
+                    const Spacer(),
+
+                    // Sandwich Bar Button
+                    Obx(() {
+                      final selected = controller.selectedCategory.value;
+                      return InkWell(
+                        onTap: () => showCategoriesModal(context, controller),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: selected == 'All' ? AppColors.background : AppColors.card,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: selected == 'All' ? AppColors.grayFade(0.2) : AppColors.card,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.black.withValues(alpha: 0.04),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.menu_rounded,
+                                size: 16,
+                                color: selected == 'All' ? AppColors.text : AppColors.white,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                selected == 'All' ? 'Categories' : selected,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: selected == 'All' ? AppColors.text : AppColors.white,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                size: 16,
+                                color: selected == 'All' ? AppColors.gray : AppColors.white,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+
+                // Active filter tag (if not 'All')
                 Obx(() {
                   final selected = controller.selectedCategory.value;
-                  return SizedBox(
-                    height: 34,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: controller.categories.length,
-                      separatorBuilder: (_, _) => const SizedBox(width: 8),
-                      itemBuilder: (context, index) {
-                        final cat = controller.categories[index];
-                        final isSelected = selected == cat;
-                        return ChoiceChip(
-                          label: Text(cat),
-                          selected: isSelected,
-                          labelStyle: TextStyle(
-                            color: isSelected ? AppColors.white : AppColors.gray,
-                            fontSize: 12,
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  if (selected == 'All') return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.purpleLight,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.card),
                           ),
-                          selectedColor: AppColors.card,
-                          backgroundColor: AppColors.background,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            side: BorderSide(
-                              color: isSelected ? AppColors.card : AppColors.grayFade(0.15),
-                            ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Category: $selected',
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.card),
+                              ),
+                              const SizedBox(width: 6),
+                              GestureDetector(
+                                onTap: () => controller.selectCategory('All'),
+                                child: const Icon(Icons.close_rounded, size: 16, color: AppColors.card),
+                              ),
+                            ],
                           ),
-                          showCheckmark: false,
-                          onSelected: (selectedVal) {
-                            if (selectedVal) controller.selectCategory(cat);
-                          },
-                        );
-                      },
+                        ),
+                      ],
                     ),
                   );
                 }),
@@ -256,13 +317,19 @@ class SocietiesView extends GetView<SocietiesController> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColors.card,
-        foregroundColor: AppColors.white,
-        icon: const Icon(Icons.add_rounded, color: AppColors.purple),
-        label: const Text('Create Society', style: TextStyle(fontWeight: FontWeight.w700)),
-        onPressed: () => _handleCreateSocietyPressed(context, authController),
-      ),
+      floatingActionButton: Obx(() {
+        final user = authController.currentUser.value;
+        final isSocietyMember = user?.isSocietyMember ?? false;
+        if (!isSocietyMember) return const SizedBox.shrink();
+
+        return FloatingActionButton.extended(
+          backgroundColor: AppColors.card,
+          foregroundColor: AppColors.white,
+          icon: const Icon(Icons.add_rounded, color: AppColors.purple),
+          label: const Text('Create Society', style: TextStyle(fontWeight: FontWeight.w700)),
+          onPressed: () => _handleCreateSocietyPressed(context, authController),
+        );
+      }),
     );
   }
 
@@ -1487,6 +1554,167 @@ class SocietiesView extends GetView<SocietiesController> {
           ),
         ),
       ],
+    );
+  }
+
+  static void showCategoriesModal(BuildContext context, SocietiesController controller) {
+    Get.bottomSheet(
+      SafeArea(
+        child: Container(
+          decoration: const BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.grayFade(0.3),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.menu_rounded, color: AppColors.card, size: 22),
+                      SizedBox(width: 8),
+                      Text(
+                        'Society Categories',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.text,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Obx(() => controller.selectedCategory.value != 'All'
+                      ? TextButton(
+                          onPressed: () {
+                            controller.selectCategory('All');
+                            Get.back();
+                          },
+                          child: const Text(
+                            'Reset to All',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.card,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink()),
+                ],
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Select a category to filter campus societies and clubs',
+                style: TextStyle(fontSize: 12, color: AppColors.gray),
+              ),
+              const SizedBox(height: 16),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: controller.categories.map((cat) {
+                      return Obx(() {
+                        final isSelected = controller.selectedCategory.value == cat;
+                        IconData iconData;
+                        switch (cat) {
+                          case 'Technical':
+                            iconData = Icons.code_rounded;
+                            break;
+                          case 'Cultural':
+                            iconData = Icons.theater_comedy_rounded;
+                            break;
+                          case 'Literary':
+                            iconData = Icons.auto_stories_rounded;
+                            break;
+                          case 'Sports':
+                            iconData = Icons.sports_soccer_rounded;
+                            break;
+                          case 'General':
+                            iconData = Icons.category_rounded;
+                            break;
+                          default:
+                            iconData = Icons.grid_view_rounded;
+                        }
+
+                        final count = cat == 'All'
+                            ? controller.societies.length
+                            : controller.societies
+                                .where((s) => s.category.toLowerCase() == cat.toLowerCase())
+                                .length;
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected ? AppColors.purpleLight : AppColors.background,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: isSelected ? AppColors.card : AppColors.grayFade(0.12),
+                              width: isSelected ? 1.5 : 1,
+                            ),
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+                            leading: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                color: isSelected ? AppColors.card : AppColors.white,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(
+                                iconData,
+                                color: isSelected ? AppColors.white : AppColors.gray,
+                                size: 20,
+                              ),
+                            ),
+                            title: Text(
+                              cat == 'All' ? 'All Societies' : cat,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                color: isSelected ? AppColors.card : AppColors.text,
+                              ),
+                            ),
+                            subtitle: Text(
+                              '$count societ${count == 1 ? 'y' : 'ies'}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: isSelected ? AppColors.card.withValues(alpha: 0.8) : AppColors.gray,
+                              ),
+                            ),
+                            trailing: isSelected
+                                ? const Icon(Icons.check_circle_rounded, color: AppColors.card, size: 22)
+                                : const Icon(Icons.chevron_right_rounded, color: AppColors.gray, size: 20),
+                            onTap: () {
+                              controller.selectCategory(cat);
+                              Get.back();
+                            },
+                          ),
+                        );
+                      });
+                    }).toList(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
     );
   }
 }

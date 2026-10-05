@@ -70,48 +70,14 @@ class EventsView extends GetView<EventsController> {
             ),
             const SizedBox(height: 18),
 
-            // Category Filter
-            SizedBox(
-              height: 38,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: controller.categories.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  final cat = controller.categories[index];
-                  final isSelected = controller.selectedCategory.value == cat;
-                  return ChoiceChip(
-                    label: Text(cat),
-                    selected: isSelected,
-                    labelStyle: TextStyle(
-                      color: isSelected ? AppColors.white : AppColors.gray,
-                      fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    ),
-                    selectedColor: AppColors.card,
-                    backgroundColor: AppColors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(color: isSelected ? AppColors.card : AppColors.grayFade(0.18)),
-                    ),
-                    showCheckmark: false,
-                    onSelected: (selected) {
-                      if (selected) controller.selectCategory(cat);
-                    },
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 18),
-
-            // Header
+            // Header with Sandwich Bar Category Selector
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
                   'Upcoming Events',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.text),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
@@ -124,8 +90,100 @@ class EventsView extends GetView<EventsController> {
                     style: const TextStyle(fontSize: 11, color: AppColors.gray, fontWeight: FontWeight.w600),
                   ),
                 ),
+                const Spacer(),
+
+                // Sandwich Bar Button
+                InkWell(
+                  onTap: () => showCategoriesModal(context, controller),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: controller.selectedCategory.value == 'All'
+                          ? AppColors.white
+                          : AppColors.card,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: controller.selectedCategory.value == 'All'
+                            ? AppColors.grayFade(0.2)
+                            : AppColors.card,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.black.withValues(alpha: 0.04),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.menu_rounded,
+                          size: 16,
+                          color: controller.selectedCategory.value == 'All'
+                              ? AppColors.text
+                              : AppColors.white,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          controller.selectedCategory.value == 'All'
+                              ? 'Categories'
+                              : controller.selectedCategory.value,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: controller.selectedCategory.value == 'All'
+                                ? AppColors.text
+                                : AppColors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          size: 16,
+                          color: controller.selectedCategory.value == 'All'
+                              ? AppColors.gray
+                              : AppColors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
+
+            // Active category filter tag (if not 'All')
+            if (controller.selectedCategory.value != 'All') ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.purpleLight,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.card),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Category: ${controller.selectedCategory.value}',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.card),
+                        ),
+                        const SizedBox(width: 6),
+                        GestureDetector(
+                          onTap: () => controller.selectCategory('All'),
+                          child: const Icon(Icons.close_rounded, size: 16, color: AppColors.card),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 12),
 
             // Empty state or events
@@ -296,6 +354,162 @@ class EventsView extends GetView<EventsController> {
           ],
         );
       }),
+    );
+  }
+
+  static void showCategoriesModal(BuildContext context, EventsController controller) {
+    Get.bottomSheet(
+      SafeArea(
+        child: Container(
+          decoration: const BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.grayFade(0.3),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.menu_rounded, color: AppColors.card, size: 22),
+                      SizedBox(width: 8),
+                      Text(
+                        'Event Categories',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.text,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Obx(() => controller.selectedCategory.value != 'All'
+                      ? TextButton(
+                          onPressed: () {
+                            controller.selectCategory('All');
+                            Get.back();
+                          },
+                          child: const Text(
+                            'Reset to All',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.card,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink()),
+                ],
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Select a category to filter upcoming campus events',
+                style: TextStyle(fontSize: 12, color: AppColors.gray),
+              ),
+              const SizedBox(height: 16),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: controller.categories.map((cat) {
+                      return Obx(() {
+                        final isSelected = controller.selectedCategory.value == cat;
+                        IconData iconData;
+                        switch (cat) {
+                          case 'Technical':
+                            iconData = Icons.code_rounded;
+                            break;
+                          case 'Cultural':
+                            iconData = Icons.theater_comedy_rounded;
+                            break;
+                          case 'Workshop':
+                            iconData = Icons.handyman_rounded;
+                            break;
+                          case 'Literary':
+                            iconData = Icons.auto_stories_rounded;
+                            break;
+                          default:
+                            iconData = Icons.grid_view_rounded;
+                        }
+
+                        final count = cat == 'All'
+                            ? controller.events.length
+                            : controller.events.where((e) => e['type'] == cat).length;
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected ? AppColors.purpleLight : AppColors.background,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: isSelected ? AppColors.card : AppColors.grayFade(0.12),
+                              width: isSelected ? 1.5 : 1,
+                            ),
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+                            leading: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                color: isSelected ? AppColors.card : AppColors.white,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(
+                                iconData,
+                                color: isSelected ? AppColors.white : AppColors.gray,
+                                size: 20,
+                              ),
+                            ),
+                            title: Text(
+                              cat == 'All' ? 'All Categories' : cat,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                color: isSelected ? AppColors.card : AppColors.text,
+                              ),
+                            ),
+                            subtitle: Text(
+                              '$count event${count == 1 ? '' : 's'}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: isSelected ? AppColors.card.withValues(alpha: 0.8) : AppColors.gray,
+                              ),
+                            ),
+                            trailing: isSelected
+                                ? const Icon(Icons.check_circle_rounded, color: AppColors.card, size: 22)
+                                : const Icon(Icons.chevron_right_rounded, color: AppColors.gray, size: 20),
+                            onTap: () {
+                              controller.selectCategory(cat);
+                              Get.back();
+                            },
+                          ),
+                        );
+                      });
+                    }).toList(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
     );
   }
 }
