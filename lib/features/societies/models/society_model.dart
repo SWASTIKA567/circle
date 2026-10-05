@@ -3,6 +3,7 @@ class SocietyEventModel {
   final String title;
   final String description;
   final String date;
+  final String time;
   final String registrationLink;
   final String imageUrl;
 
@@ -11,6 +12,7 @@ class SocietyEventModel {
     required this.title,
     this.description = '',
     this.date = '',
+    this.time = '',
     this.registrationLink = '',
     this.imageUrl = '',
   });
@@ -21,6 +23,7 @@ class SocietyEventModel {
       title: json['title'] ?? '',
       description: json['description'] ?? '',
       date: json['date'] ?? '',
+      time: json['time'] ?? '',
       registrationLink: json['registrationLink'] ?? '',
       imageUrl: json['imageUrl'] ?? '',
     );
@@ -32,6 +35,7 @@ class SocietyEventModel {
       'title': title,
       'description': description,
       'date': date,
+      'time': time,
       'registrationLink': registrationLink,
       'imageUrl': imageUrl,
     };

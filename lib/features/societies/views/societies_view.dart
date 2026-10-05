@@ -1357,6 +1357,8 @@ class SocietiesView extends GetView<SocietiesController> {
     // Event additions
     final eventTitleController = TextEditingController();
     final eventDateController = TextEditingController();
+    final eventTimeController = TextEditingController();
+    final eventImageController = TextEditingController();
     final eventLinkController = TextEditingController();
     final eventDescController = TextEditingController();
     final isUpcoming = true.obs;
@@ -1462,8 +1464,19 @@ class SocietiesView extends GetView<SocietiesController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Add an Event', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.text)),
-                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const Icon(Icons.event_note_rounded, size: 18, color: AppColors.card),
+                        const SizedBox(width: 8),
+                        const Text('Add an Event', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.text)),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Upcoming events appear on the Home screen for up to 2 days from the event date.',
+                      style: TextStyle(fontSize: 11, color: AppColors.gray),
+                    ),
+                    const SizedBox(height: 10),
                     Obx(() => Row(
                       children: [
                         ChoiceChip(
@@ -1479,16 +1492,32 @@ class SocietiesView extends GetView<SocietiesController> {
                         ),
                       ],
                     )),
+                    const SizedBox(height: 10),
+                    _buildTextField(controller: eventTitleController, label: 'Event Title *', hint: 'e.g. TechSprint 2026'),
                     const SizedBox(height: 8),
-                    _buildTextField(controller: eventTitleController, label: 'Event Title', hint: 'e.g. TechSprint 2026'),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildTextField(controller: eventDateController, label: 'Date', hint: '25 Nov 2026'),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _buildTextField(controller: eventTimeController, label: 'Time', hint: '10:00 AM'),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 8),
-                    _buildTextField(controller: eventDateController, label: 'Date', hint: 'e.g. 15 Nov 2026'),
+                    _buildTextField(
+                      controller: eventImageController,
+                      label: 'Event Image URL (optional)',
+                      hint: 'https://... shown as banner on home screen',
+                    ),
                     const SizedBox(height: 8),
                     Obx(() => isUpcoming.value
                         ? _buildTextField(controller: eventLinkController, label: 'Registration Link', hint: 'https://...')
                         : const SizedBox.shrink()),
                     const SizedBox(height: 8),
-                    _buildTextField(controller: eventDescController, label: 'Description', hint: 'Details...'),
+                    _buildTextField(controller: eventDescController, label: 'Description', hint: 'Brief details about the event...'),
                   ],
                 ),
               ),
@@ -1529,6 +1558,8 @@ class SocietiesView extends GetView<SocietiesController> {
                             final newEvent = SocietyEventModel(
                               title: eventTitleController.text.trim(),
                               date: eventDateController.text.trim(),
+                              time: eventTimeController.text.trim(),
+                              imageUrl: eventImageController.text.trim(),
                               registrationLink: eventLinkController.text.trim(),
                               description: eventDescController.text.trim(),
                             );

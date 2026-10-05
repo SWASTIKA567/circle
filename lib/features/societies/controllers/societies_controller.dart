@@ -59,6 +59,124 @@ class SocietiesController extends GetxController {
 
   void selectCategory(String category) => selectedCategory.value = category;
   void updateSearch(String query) => searchQuery.value = query;
+
+  DateTime? _parseEventDate(String dateStr) {
+    if (dateStr.trim().isEmpty) return null;
+    try {
+      final parsed = DateTime.tryParse(dateStr.trim());
+      if (parsed != null) return parsed;
+      final parts = dateStr.trim().split(RegExp(r'[\s/\-]'));
+      if (parts.length >= 3) {
+        const months = {
+          'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4,
+          'may': 5, 'jun': 6, 'jul': 7, 'aug': 8,
+          'sep': 9, 'oct': 10, 'nov': 11, 'dec': 12,
+        };
+        final day = int.tryParse(parts[0]);
+        final monthKey = parts[1].toLowerCase().substring(0, 3);
+        final month = months[monthKey];
+        final year = int.tryParse(parts[2]);
+        if (day != null && month != null && year != null) {
+          return DateTime(year, month, day);
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  /// Returns upcoming events from all approved societies for the Home screen.
+  /// Visible for maximum 2 days from the event date.
+  List<Map<String, dynamic>> get societyEventsForHomeFeed {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final List<Map<String, dynamic>> feed = [];
+
+    for (final soc in societies) {
+      for (final evt in soc.upcomingEvents) {
+        if (evt.title.isEmpty) continue;
+
+        final eventDate = _parseEventDate(evt.date);
+        if (eventDate != null) {
+          final diffDays = eventDate.difference(today).inDays;
+          // Only show on upcoming if between 0 and 2 days (max 2 days active window)
+          if (diffDays < 0 || diffDays > 2) continue;
+        }
+
+        feed.add({
+          'title': evt.title,
+          'society': soc.name,
+          'societyId': soc.id,
+          'date': evt.date,
+          'time': evt.time,
+          'description': evt.description,
+          'imageUrl': evt.imageUrl,
+          'registrationLink': evt.registrationLink,
+          'type': soc.category,
+          'isRsvp': false,
+          'source': 'society',
+          'isPast': false,
+        });
+      }
+    }
+
+    return feed;
+  }
+
+  /// Returns past events from all societies (both explicit recentEvents and
+  /// upcoming events that passed their 2-day home visibility window).
+  List<Map<String, dynamic>> get societyPastEventsForHomeFeed {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final List<Map<String, dynamic>> feed = [];
+
+    for (final soc in societies) {
+      // 1. Explicit recent/past events
+      for (final evt in soc.recentEvents) {
+        if (evt.title.isEmpty) continue;
+        feed.add({
+          'title': evt.title,
+          'society': soc.name,
+          'societyId': soc.id,
+          'date': evt.date,
+          'time': evt.time,
+          'description': evt.description,
+          'imageUrl': evt.imageUrl,
+          'registrationLink': evt.registrationLink,
+          'type': soc.category,
+          'isRsvp': false,
+          'source': 'society',
+          'isPast': true,
+        });
+      }
+
+      // 2. Upcoming events that expired (> 2 days past or already completed)
+      for (final evt in soc.upcomingEvents) {
+        if (evt.title.isEmpty) continue;
+        final eventDate = _parseEventDate(evt.date);
+        if (eventDate != null) {
+          final diffDays = eventDate.difference(today).inDays;
+          if (diffDays < 0 || diffDays > 2) {
+            feed.add({
+              'title': evt.title,
+              'society': soc.name,
+              'societyId': soc.id,
+              'date': evt.date,
+              'time': evt.time,
+              'description': evt.description,
+              'imageUrl': evt.imageUrl,
+              'registrationLink': evt.registrationLink,
+              'type': soc.category,
+              'isRsvp': false,
+              'source': 'society',
+              'isPast': true,
+            });
+          }
+        }
+      }
+    }
+
+    return feed;
+  }
   void clearSearch() {
     searchController.clear();
     searchQuery.value = '';
