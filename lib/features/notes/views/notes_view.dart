@@ -878,29 +878,29 @@ class NotesView extends GetView<NotesController> {
                           style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.text),
                         ),
                         const SizedBox(height: 6),
-                        Obx(() => Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: AppColors.background,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.grayFade(0.2)),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: selectedSubject.value,
-                              isExpanded: true,
-                              items: subjects
-                                  .map((s) => DropdownMenuItem(
-                                        value: s,
-                                        child: Text(s, style: const TextStyle(fontSize: 13, color: AppColors.text), overflow: TextOverflow.ellipsis),
-                                      ))
-                                  .toList(),
-                              onChanged: (val) {
-                                if (val != null) selectedSubject.value = val;
-                              },
+                        TextField(
+                          controller: subjectController,
+                          style: const TextStyle(fontSize: 14, color: AppColors.text),
+                          decoration: InputDecoration(
+                            hintText: 'e.g. Operating Systems',
+                            hintStyle: const TextStyle(color: AppColors.gray, fontSize: 13),
+                            filled: true,
+                            fillColor: AppColors.background,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: AppColors.grayFade(0.2)),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: AppColors.grayFade(0.2)),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: AppColors.purple, width: 1.6),
                             ),
                           ),
-                        )),
+                        ),
                       ],
                     ),
                   ),
@@ -980,10 +980,21 @@ class NotesView extends GetView<NotesController> {
                             return;
                           }
 
+                          if (subjectController.text.trim().isEmpty) {
+                            Get.snackbar(
+                              'Subject Required',
+                              'Please enter the subject name.',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: AppColors.pinkLight,
+                              colorText: AppColors.magenta,
+                            );
+                            return;
+                          }
+
                           final success = await controller.uploadNote(
                             file: pickedFile.value!,
                             title: titleController.text.trim(),
-                            subject: selectedSubject.value,
+                            subject: subjectController.text.trim(),
                             semester: selectedSemester.value,
                             unit: unitController.text.trim().isEmpty ? 'Unit 1' : unitController.text.trim(),
                           );

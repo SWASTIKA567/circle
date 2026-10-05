@@ -188,7 +188,14 @@ class HomeView extends GetView<HomeController> {
           children: [
             const Row(
               children: [
-                Icon(Icons.all_inclusive_rounded, color: AppColors.purple, size: 20),
+                ClipOval(
+                  child: Image(
+                    image: AssetImage('assets/circle_logo.jpg'),
+                    width: 22,
+                    height: 22,
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 SizedBox(width: 6),
                 Text(
                   'Circle',

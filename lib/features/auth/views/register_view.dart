@@ -76,34 +76,43 @@ class _RegisterViewState extends State<RegisterView> {
                 children: [
                   Center(
                     child: Container(
-                      width: 76,
-                      height: 76,
+                      width: 88,
+                      height: 88,
                       decoration: BoxDecoration(
-                        color: AppColors.card,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.black.withValues(alpha: 0.12),
-                            blurRadius: 18,
+                            color: AppColors.purple.withValues(alpha: 0.32),
+                            blurRadius: 22,
                             offset: const Offset(0, 6),
                           ),
                         ],
                       ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.person_add_alt_1_rounded,
-                          color: AppColors.purple,
-                          size: 38,
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/circle_logo.jpg',
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 14),
+                  const Text(
+                    'Circle',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Chicle',
+                      fontSize: 30,
+                      color: AppColors.text,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
                   const Text(
                     'Create Account',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: 24,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text,
                       letterSpacing: 0.8,

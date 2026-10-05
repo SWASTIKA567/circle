@@ -131,37 +131,35 @@ class _LoginViewState extends State<LoginView> {
                 children: [
                   Center(
                     child: Container(
-                      width: 86,
-                      height: 86,
+                      width: 100,
+                      height: 100,
                       decoration: BoxDecoration(
-                        color: AppColors.card,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.black.withValues(alpha: 0.12),
-                            blurRadius: 20,
+                            color: AppColors.purple.withValues(alpha: 0.35),
+                            blurRadius: 28,
                             offset: const Offset(0, 8),
                           ),
                         ],
                       ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.all_inclusive_rounded,
-                          color: AppColors.purple,
-                          size: 44,
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/circle_logo.jpg',
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   const Text(
                     'Circle',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w800,
+                      fontFamily: 'Chicle',
+                      fontSize: 36,
                       color: AppColors.text,
-                      letterSpacing: 1.0,
+                      letterSpacing: 1.5,
                     ),
                   ),
                   const SizedBox(height: 6),
