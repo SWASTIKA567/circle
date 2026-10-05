@@ -179,7 +179,7 @@ class _LoginViewState extends State<LoginView> {
                     style: const TextStyle(color: AppColors.text, fontSize: 14),
                     decoration: InputDecoration(
                       labelText: 'Email or Student No.',
-                      hintText: 'user@example.com or STU-102',
+                      hintText: 'student@akgec.ac.in or 210032...',
                       labelStyle: const TextStyle(color: AppColors.gray),
                       prefixIcon: const Icon(Icons.account_circle_outlined, color: AppColors.gray),
                       filled: true,

@@ -188,6 +188,9 @@ class AuthController extends GetxController {
 
   String _cleanErrorMessage(String raw) {
     var msg = raw.replaceFirst('Exception: ', '');
+    if (msg.contains('TimeoutException') || msg.contains('Future not completed')) {
+      return 'Server is waking up. Please wait a few seconds and try again or sign in directly.';
+    }
     if (msg.contains('SocketException')) {
       return 'Unable to reach backend server. Please verify your connection.';
     }

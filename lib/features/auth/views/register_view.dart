@@ -156,13 +156,15 @@ class _RegisterViewState extends State<RegisterView> {
                   const SizedBox(height: 16),
                   _buildTextField(
                     controller: _emailController,
-                    label: 'Email Address',
+                    label: 'College Email',
+                    hint: 'student@akgec.ac.in',
                     icon: Icons.email_outlined,
                     keyboardType: TextInputType.emailAddress,
                     validator: (val) {
-                      if (val == null || val.trim().isEmpty) return 'Email is required';
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val.trim())) {
-                        return 'Please enter a valid email address';
+                      if (val == null || val.trim().isEmpty) return 'College email is required';
+                      final email = val.trim().toLowerCase();
+                      if (!RegExp(r'^[\w\.-]+@akgec\.ac\.in$').hasMatch(email)) {
+                        return 'Email must end with @akgec.ac.in';
                       }
                       return null;
                     },

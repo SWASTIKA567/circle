@@ -57,7 +57,7 @@ class ApiService {
             headers: _headers(token: token),
             body: jsonEncode(body),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 60));
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
 
@@ -69,7 +69,7 @@ class ApiService {
       }
     } on SocketException {
       throw Exception(
-        'Unable to connect to backend server. Make sure the Node.js backend is running on port 5000.',
+        'Unable to connect to backend server. Make sure the server is online.',
       );
     } catch (e) {
       if (e is Exception) rethrow;
@@ -90,7 +90,7 @@ class ApiService {
             headers: _headers(token: token),
             body: jsonEncode(body),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 60));
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
 
@@ -102,7 +102,7 @@ class ApiService {
       }
     } on SocketException {
       throw Exception(
-        'Unable to connect to backend server. Make sure the Node.js backend is running on port 5000.',
+        'Unable to connect to backend server. Make sure the server is online.',
       );
     } catch (e) {
       if (e is Exception) rethrow;
@@ -121,7 +121,7 @@ class ApiService {
             uri,
             headers: _headers(token: token),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 60));
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
 
@@ -133,7 +133,7 @@ class ApiService {
       }
     } on SocketException {
       throw Exception(
-        'Unable to connect to backend server. Make sure the Node.js backend is running on port 5000.',
+        'Unable to connect to backend server. Make sure the server is online.',
       );
     } catch (e) {
       if (e is Exception) rethrow;
@@ -152,7 +152,7 @@ class ApiService {
             uri,
             headers: _headers(token: token),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 60));
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
 
