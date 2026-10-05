@@ -14,6 +14,10 @@ class SocietiesController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxBool isSubmitting = false.obs;
   final RxString errorMessage = ''.obs;
+  final RxMap<String, String> unlockedSocieties = <String, String>{}.obs;
+
+  bool isSocietyUnlocked(String societyId) => unlockedSocieties.containsKey(societyId);
+  String? getSocietyPassword(String societyId) => unlockedSocieties[societyId];
 
   final List<String> categories = [
     'All',
@@ -169,7 +173,11 @@ class SocietiesController extends GetxController {
         token: token,
       );
 
-      return response['success'] == true;
+      final success = response['success'] == true;
+      if (success) {
+        unlockedSocieties[societyId] = password.trim();
+      }
+      return success;
     } catch (e) {
       Get.snackbar(
         'Verification Failed',
@@ -242,6 +250,12 @@ class SocietiesController extends GetxController {
           societies[index] = updatedSociety;
         } else {
           fetchSocieties();
+        }
+
+        if (newSocietyPassword != null && newSocietyPassword.trim().isNotEmpty) {
+          unlockedSocieties[societyId] = newSocietyPassword.trim();
+        } else {
+          unlockedSocieties[societyId] = societyPassword.trim();
         }
 
         Get.snackbar(

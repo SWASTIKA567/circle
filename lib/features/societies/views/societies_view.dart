@@ -372,9 +372,6 @@ class SocietiesView extends GetView<SocietiesController> {
     SocietyModel soc,
     AuthController authController,
   ) {
-    final user = authController.currentUser.value;
-    final isSocietyMember = user?.isSocietyMember ?? false;
-
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
@@ -537,37 +534,47 @@ class SocietiesView extends GetView<SocietiesController> {
             // Action Buttons
             Row(
               children: [
-                // Non-members & Members can view
+                // View Details (Public Feed for all students)
                 Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryIndigo,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.text,
+                      side: BorderSide(color: AppColors.grayFade(0.3)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 9),
                     ),
-                    icon: const Icon(Icons.visibility_rounded, size: 16),
+                    icon: const Icon(Icons.info_outline_rounded, size: 16),
                     label: const Text('View Details', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                     onPressed: () => _showSocietyDetailsModal(context, soc),
                   ),
                 ),
 
-                // Members with password can edit
-                if (isSocietyMember) ...[
-                  const SizedBox(width: 8),
-                  OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: primaryIndigo,
-                      side: const BorderSide(color: primaryIndigo),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    ),
-                    icon: const Icon(Icons.lock_outline_rounded, size: 15),
-                    label: const Text('Edit', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                    onPressed: () => _promptSocietyPasswordAndEdit(context, soc),
-                  ),
-                ],
+                const SizedBox(width: 8),
+
+                // Enter Society (Requires Society Password)
+                Expanded(
+                  child: Obx(() {
+                    final isUnlocked = controller.isSocietyUnlocked(soc.id);
+                    return ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isUnlocked ? AppColors.green : primaryIndigo,
+                        foregroundColor: isUnlocked ? AppColors.black : Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(vertical: 9),
+                      ),
+                      icon: Icon(
+                        isUnlocked ? Icons.verified_rounded : Icons.lock_rounded,
+                        size: 16,
+                      ),
+                      label: Text(
+                        isUnlocked ? 'Entered ✓' : 'Enter Society',
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                      ),
+                      onPressed: () => _handleEnterSocietyPressed(context, soc),
+                    );
+                  }),
+                ),
               ],
             ),
           ],
@@ -852,6 +859,34 @@ class SocietiesView extends GetView<SocietiesController> {
                   );
                 }),
               ],
+              const SizedBox(height: 20),
+              // Member Access Option in details modal
+              SizedBox(
+                width: double.infinity,
+                child: Obx(() {
+                  final isUnlocked = controller.isSocietyUnlocked(soc.id);
+                  return ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isUnlocked ? AppColors.green : primaryIndigo,
+                      foregroundColor: isUnlocked ? AppColors.black : Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    icon: Icon(isUnlocked ? Icons.verified_rounded : Icons.lock_rounded, size: 18),
+                    label: Text(
+                      isUnlocked
+                          ? 'Manage Society (Entered ✓)'
+                          : 'Enter Society (Password Required)',
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                    ),
+                    onPressed: () {
+                      Get.back(); // close details modal
+                      _handleEnterSocietyPressed(context, soc);
+                    },
+                  );
+                }),
+              ),
             ],
           ),
         ),
@@ -860,8 +895,19 @@ class SocietiesView extends GetView<SocietiesController> {
     );
   }
 
-  // --- Password Prompt to Edit Society ---
-  void _promptSocietyPasswordAndEdit(BuildContext context, SocietyModel soc) {
+  // --- Handle Enter Society Pressed (Unlocked vs Locked) ---
+  void _handleEnterSocietyPressed(BuildContext context, SocietyModel soc) {
+    if (controller.isSocietyUnlocked(soc.id)) {
+      final pass = controller.getSocietyPassword(soc.id)!;
+      _showEditSocietyModal(context, soc, pass);
+      return;
+    }
+
+    _promptSocietyPasswordAndEnter(context, soc);
+  }
+
+  // --- Password Prompt to Enter Society as a Member ---
+  void _promptSocietyPasswordAndEnter(BuildContext context, SocietyModel soc) {
     final passwordController = TextEditingController();
     final isPasswordHidden = true.obs;
 
@@ -872,7 +918,7 @@ class SocietiesView extends GetView<SocietiesController> {
           children: [
             const Icon(Icons.lock_rounded, color: primaryIndigo),
             const SizedBox(width: 8),
-            const Text('Society Password', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Enter Society', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ],
         ),
         content: Column(
@@ -880,8 +926,8 @@ class SocietiesView extends GetView<SocietiesController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Enter the password for "${soc.name}" to edit details, events, and links.',
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+              'Enter the password for "${soc.name}" to enter this society and manage events & details.',
+              style: const TextStyle(fontSize: 13, color: AppColors.text, height: 1.35),
             ),
             const SizedBox(height: 14),
             Obx(() => TextField(
@@ -932,10 +978,18 @@ class SocietiesView extends GetView<SocietiesController> {
               Get.back(); // close password dialog
               final verified = await controller.verifySocietyPassword(soc.id, pass);
               if (verified && context.mounted) {
+                Get.snackbar(
+                  'Entered Successfully! 🔑',
+                  'Welcome to ${soc.name}. You now have access to manage this society.',
+                  backgroundColor: AppColors.card,
+                  colorText: AppColors.white,
+                  snackPosition: SnackPosition.BOTTOM,
+                  margin: const EdgeInsets.all(16),
+                );
                 _showEditSocietyModal(context, soc, pass);
               }
             },
-            child: const Text('Verify & Edit'),
+            child: const Text('Verify & Enter'),
           ),
         ],
       ),
@@ -1063,17 +1117,22 @@ class SocietiesView extends GetView<SocietiesController> {
                     ),
                     const SizedBox(height: 10),
 
-                    // Society Password *
+                    // Common Society Password *
                     const Text(
-                      'Society Password * (for future edits)',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87),
+                      'Common Society Password * (For All Members of This Society)',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.text),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
+                    const Text(
+                      'Other members of this society will enter this password to access and manage events/details.',
+                      style: TextStyle(fontSize: 11, color: AppColors.gray),
+                    ),
+                    const SizedBox(height: 6),
                     Obx(() => TextField(
                       controller: passwordController,
                       obscureText: isPasswordHidden.value,
                       decoration: InputDecoration(
-                        hintText: 'Set a password (min 4 characters)',
+                        hintText: 'Set common society password (min 4 characters)',
                         hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
                         prefixIcon: const Icon(Icons.lock_rounded, color: primaryIndigo, size: 20),
                         suffixIcon: IconButton(
