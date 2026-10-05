@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../../app/theme/app_theme.dart';
 import '../controllers/notes_controller.dart';
@@ -110,6 +111,63 @@ class NotesView extends GetView<NotesController> {
               if (controller.isLoading.value) {
                 return const Center(
                   child: CircularProgressIndicator(color: AppColors.purple),
+                );
+              }
+
+              if (controller.errorMessage.value.isNotEmpty) {
+                return RefreshIndicator(
+                  color: AppColors.card,
+                  onRefresh: controller.fetchNotes,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.16),
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/no_network_dog.svg',
+                              height: 140,
+                              fit: BoxFit.contain,
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Connection Issue',
+                              style: TextStyle(
+                                color: AppColors.text,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 32),
+                              child: Text(
+                                controller.errorMessage.value.contains('timed out') ||
+                                        controller.errorMessage.value.contains('SocketException')
+                                    ? 'Unable to reach the campus server. Check your connection.'
+                                    : controller.errorMessage.value,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: AppColors.gray, fontSize: 13),
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.card,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                              icon: const Icon(Icons.refresh_rounded, size: 16),
+                              label: const Text('Try Again'),
+                              onPressed: controller.fetchNotes,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 );
               }
 

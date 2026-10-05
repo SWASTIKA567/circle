@@ -193,10 +193,10 @@ class HomeView extends GetView<HomeController> {
                 Text(
                   'Circle',
                   style: TextStyle(
-                    fontWeight: FontWeight.w800,
+                    fontFamily: 'Chicle',
                     color: AppColors.white,
-                    fontSize: 18,
-                    letterSpacing: 0.8,
+                    fontSize: 24,
+                    letterSpacing: 1.2,
                   ),
                 ),
               ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../app/theme/app_theme.dart';
 import '../controllers/societies_controller.dart';
 import '../models/society_model.dart';
@@ -240,6 +241,62 @@ class SocietiesView extends GetView<SocietiesController> {
                 return const Center(child: CircularProgressIndicator(color: AppColors.purple));
               }
 
+              if (controller.errorMessage.value.isNotEmpty) {
+                return RefreshIndicator(
+                  color: AppColors.card,
+                  onRefresh: controller.fetchSocieties,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.16),
+                      Center(
+                        child: Column(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/no_network_dog.svg',
+                              height: 140,
+                              fit: BoxFit.contain,
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Connection Issue',
+                              style: TextStyle(
+                                color: AppColors.text,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 32),
+                              child: Text(
+                                controller.errorMessage.value.contains('timed out') ||
+                                        controller.errorMessage.value.contains('SocketException')
+                                    ? 'Unable to connect to campus network. Please check your internet.'
+                                    : controller.errorMessage.value,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: AppColors.gray, fontSize: 13),
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.card,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                              icon: const Icon(Icons.refresh_rounded, size: 16),
+                              label: const Text('Try Again'),
+                              onPressed: controller.fetchSocieties,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
               final filtered = controller.filteredSocieties;
               if (filtered.isEmpty) {
                 return RefreshIndicator(
@@ -252,13 +309,10 @@ class SocietiesView extends GetView<SocietiesController> {
                       Center(
                         child: Column(
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration: const BoxDecoration(
-                                color: AppColors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.groups_outlined, size: 52, color: AppColors.gray),
+                            SvgPicture.asset(
+                              'assets/no_society_dog.svg',
+                              height: 140,
+                              fit: BoxFit.contain,
                             ),
                             const SizedBox(height: 16),
                             Text(
