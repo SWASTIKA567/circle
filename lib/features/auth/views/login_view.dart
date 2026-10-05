@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../app/routes/app_routes.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../core/services/api_service.dart';
 import '../controllers/auth_controller.dart';
@@ -164,12 +163,12 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'Sign in with Email or Student No.',
+                    'AKGEC Student ERP Login',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
                       color: AppColors.gray,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 36),
@@ -178,8 +177,8 @@ class _LoginViewState extends State<LoginView> {
                     keyboardType: TextInputType.text,
                     style: const TextStyle(color: AppColors.text, fontSize: 14),
                     decoration: InputDecoration(
-                      labelText: 'Email or Student No.',
-                      hintText: 'student@akgec.ac.in or 210032...',
+                      labelText: 'Student No. or College Email',
+                      hintText: 'e.g. 2100320130001 or student@akgec.ac.in',
                       labelStyle: const TextStyle(color: AppColors.gray),
                       prefixIcon: const Icon(Icons.account_circle_outlined, color: AppColors.gray),
                       filled: true,
@@ -215,7 +214,8 @@ class _LoginViewState extends State<LoginView> {
                       obscureText: _obscurePassword.value,
                       style: const TextStyle(color: AppColors.text, fontSize: 14),
                       decoration: InputDecoration(
-                        labelText: 'Password',
+                        labelText: 'ERP Password',
+                        hintText: 'Enter your AKGEC ERP password',
                         labelStyle: const TextStyle(color: AppColors.gray),
                         prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.gray),
                         suffixIcon: IconButton(
@@ -248,10 +248,7 @@ class _LoginViewState extends State<LoginView> {
                       ),
                       validator: (val) {
                         if (val == null || val.isEmpty) {
-                          return 'Password is required';
-                        }
-                        if (val.length < 6) {
-                          return 'Password must be at least 6 characters';
+                          return 'ERP password is required';
                         }
                         return null;
                       },
@@ -283,7 +280,7 @@ class _LoginViewState extends State<LoginView> {
                                 ),
                               )
                             : const Text(
-                                'Sign In',
+                                'Sign In with ERP',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
@@ -297,20 +294,14 @@ class _LoginViewState extends State<LoginView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        "Don't have an account? ",
-                        style: TextStyle(color: AppColors.gray, fontSize: 14),
-                      ),
-                      GestureDetector(
-                        onTap: () => Get.toNamed(Routes.REGISTER),
-                        child: const Text(
-                          'Sign Up',
-                          style: TextStyle(
-                            color: AppColors.text,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 14,
-                            decoration: TextDecoration.underline,
-                          ),
+                      Icon(Icons.verified_user_outlined, size: 16, color: AppColors.grayFade(0.7)),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Direct AKGEC Student ERP Authentication',
+                        style: TextStyle(
+                          color: AppColors.grayFade(0.8),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],

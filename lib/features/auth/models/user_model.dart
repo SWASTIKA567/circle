@@ -1,8 +1,25 @@
 class UserModel {
   final String id;
   final String name;
+  final String? firstName;
+  final String? lastName;
   final String studentNo;
+  final String? admissionNo;
   final String email;
+  final String? course;
+  final String? branch;
+  final String? semester;
+  final String? mobileNo;
+  final String? dob;
+  final String? bloodGroup;
+  final String? fatherName;
+  final String? motherName;
+  final dynamic jeeRank;
+  final String? highSchoolPercentage;
+  final String? intermediatePercentage;
+  final String? bankName;
+  final String? ifscCode;
+  final String? address;
   final bool isSocietyMember;
   final bool isAdmin;
   final String role;
@@ -12,8 +29,25 @@ class UserModel {
   UserModel({
     required this.id,
     required this.name,
+    this.firstName,
+    this.lastName,
     required this.studentNo,
+    this.admissionNo,
     required this.email,
+    this.course,
+    this.branch,
+    this.semester,
+    this.mobileNo,
+    this.dob,
+    this.bloodGroup,
+    this.fatherName,
+    this.motherName,
+    this.jeeRank,
+    this.highSchoolPercentage,
+    this.intermediatePercentage,
+    this.bankName,
+    this.ifscCode,
+    this.address,
     this.isSocietyMember = false,
     this.isAdmin = false,
     this.role = 'student',
@@ -29,8 +63,25 @@ class UserModel {
     return UserModel(
       id: userData['id'] ?? userData['_id'] ?? '',
       name: userData['name'] ?? '',
+      firstName: userData['firstName'],
+      lastName: userData['lastName'],
       studentNo: userData['studentNo'] ?? '',
+      admissionNo: userData['admissionNo'],
       email: userData['email'] ?? '',
+      course: userData['course'],
+      branch: userData['branch'],
+      semester: userData['semester'],
+      mobileNo: userData['mobileNo'],
+      dob: userData['dob'],
+      bloodGroup: userData['bloodGroup'],
+      fatherName: userData['fatherName'],
+      motherName: userData['motherName'],
+      jeeRank: userData['jeeRank'],
+      highSchoolPercentage: userData['highSchoolPercentage'],
+      intermediatePercentage: userData['intermediatePercentage'],
+      bankName: userData['bankName'],
+      ifscCode: userData['ifscCode'],
+      address: userData['address'],
       isSocietyMember: userData['isSocietyMember'] ?? false,
       isAdmin: isAdminVal,
       role: roleVal,
@@ -45,8 +96,25 @@ class UserModel {
     return {
       'id': id,
       'name': name,
+      if (firstName != null) 'firstName': firstName,
+      if (lastName != null) 'lastName': lastName,
       'studentNo': studentNo,
+      if (admissionNo != null) 'admissionNo': admissionNo,
       'email': email,
+      if (course != null) 'course': course,
+      if (branch != null) 'branch': branch,
+      if (semester != null) 'semester': semester,
+      if (mobileNo != null) 'mobileNo': mobileNo,
+      if (dob != null) 'dob': dob,
+      if (bloodGroup != null) 'bloodGroup': bloodGroup,
+      if (fatherName != null) 'fatherName': fatherName,
+      if (motherName != null) 'motherName': motherName,
+      if (jeeRank != null) 'jeeRank': jeeRank,
+      if (highSchoolPercentage != null) 'highSchoolPercentage': highSchoolPercentage,
+      if (intermediatePercentage != null) 'intermediatePercentage': intermediatePercentage,
+      if (bankName != null) 'bankName': bankName,
+      if (ifscCode != null) 'ifscCode': ifscCode,
+      if (address != null) 'address': address,
       'isSocietyMember': isSocietyMember,
       'isAdmin': isAdmin,
       'role': role,
