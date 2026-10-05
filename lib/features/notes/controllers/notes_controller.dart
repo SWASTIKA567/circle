@@ -18,12 +18,14 @@ class NotesController extends GetxController {
 
   final List<String> categories = [
     'All',
-    'Computer Science',
-    'Data Structures',
-    'OS',
-    'Networks',
-    'Mathematics',
-    'General',
+    'Semester 1',
+    'Semester 2',
+    'Semester 3',
+    'Semester 4',
+    'Semester 5',
+    'Semester 6',
+    'Semester 7',
+    'Semester 8',
   ];
 
   @override
@@ -40,9 +42,9 @@ class NotesController extends GetxController {
 
   List<NoteModel> get filteredNotes {
     return notes.where((note) {
-      final matchesCategory =
-          selectedCategory.value == 'All' ||
-          note.subject.toLowerCase() == selectedCategory.value.toLowerCase();
+      final matchesCategory = selectedCategory.value == 'All' ||
+          note.semester.toLowerCase().trim() == selectedCategory.value.toLowerCase().trim() ||
+          note.semester.toLowerCase().replaceAll(' ', '') == selectedCategory.value.toLowerCase().replaceAll(' ', '');
 
       final query = searchQuery.value.trim().toLowerCase();
       final matchesQuery = query.isEmpty ||
@@ -55,6 +57,44 @@ class NotesController extends GetxController {
 
       return matchesCategory && matchesQuery;
     }).toList();
+  }
+
+  /// List of 8 semester boxes
+  final List<Map<String, String>> semesterBoxes = const [
+    {'key': 'Semester 1', 'title': '1st Semester', 'code': 'SEM 01'},
+    {'key': 'Semester 2', 'title': '2nd Semester', 'code': 'SEM 02'},
+    {'key': 'Semester 3', 'title': '3rd Semester', 'code': 'SEM 03'},
+    {'key': 'Semester 4', 'title': '4th Semester', 'code': 'SEM 04'},
+    {'key': 'Semester 5', 'title': '5th Semester', 'code': 'SEM 05'},
+    {'key': 'Semester 6', 'title': '6th Semester', 'code': 'SEM 06'},
+    {'key': 'Semester 7', 'title': '7th Semester', 'code': 'SEM 07'},
+    {'key': 'Semester 8', 'title': '8th Semester', 'code': 'SEM 08'},
+  ];
+
+  /// Active semester entered by user. If null, shows the 8 semester boxes.
+  final Rx<String?> currentSemester = Rx<String?>(null);
+
+  void enterSemester(String semesterKey) {
+    currentSemester.value = semesterKey;
+    selectedCategory.value = semesterKey;
+    clearSearch();
+  }
+
+  void exitSemester() {
+    currentSemester.value = null;
+    selectedCategory.value = 'All';
+    clearSearch();
+  }
+
+  int countForSemester(String key) {
+    final norm = key.toLowerCase().replaceAll(' ', '');
+    return notes.where((n) => n.semester.toLowerCase().replaceAll(' ', '') == norm).length;
+  }
+
+  int countForCategory(String category) {
+    if (category == 'All') return notes.length;
+    final catNorm = category.toLowerCase().replaceAll(' ', '');
+    return notes.where((n) => n.semester.toLowerCase().replaceAll(' ', '') == catNorm).length;
   }
 
   void selectCategory(String category) => selectedCategory.value = category;

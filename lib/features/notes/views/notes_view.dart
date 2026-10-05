@@ -12,244 +12,484 @@ class NotesView extends GetView<NotesController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          // Search & Filters Header
-          Container(
-            padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              border: Border(bottom: BorderSide(color: AppColors.grayFade(0.12))),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.02),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Modern Minimal Search Input
-                TextField(
-                  controller: controller.searchController,
-                  onChanged: controller.updateSearch,
-                  style: const TextStyle(fontSize: 14, color: AppColors.text),
-                  decoration: InputDecoration(
-                    hintText: 'Search by title, subject, unit, semester...',
-                    hintStyle: const TextStyle(color: AppColors.gray, fontSize: 13),
-                    prefixIcon: const Icon(Icons.search_rounded, color: AppColors.gray),
-                    suffixIcon: Obx(() => controller.searchQuery.value.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, color: AppColors.gray, size: 20),
-                            onPressed: controller.clearSearch,
-                          )
-                        : const SizedBox.shrink()),
-                    filled: true,
-                    fillColor: AppColors.background,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: AppColors.grayFade(0.15)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: AppColors.grayFade(0.15)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(color: AppColors.purple, width: 1.8),
+    return Obx(() {
+      final isInsideSemester = controller.currentSemester.value != null;
+
+      return PopScope(
+        canPop: !isInsideSemester,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop && isInsideSemester) {
+            controller.exitSemester();
+          }
+        },
+        child: Scaffold(
+          backgroundColor: AppColors.background,
+          body: isInsideSemester
+              ? _buildInsideSemesterView(context)
+              : _buildSemesterBoxesView(context),
+          floatingActionButton: isInsideSemester
+              ? FloatingActionButton.extended(
+                  backgroundColor: AppColors.card,
+                  foregroundColor: AppColors.white,
+                  icon: const Icon(Icons.upload_file_rounded, color: AppColors.purple),
+                  label: const Text('Upload Note', style: TextStyle(fontWeight: FontWeight.w700)),
+                  onPressed: () => _showUploadBottomSheet(context),
+                )
+              : null,
+        ),
+      );
+    });
+  }
+
+  /// 8 Semester boxes view
+  Widget _buildSemesterBoxesView(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      children: [
+        // Greeting Card
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.card,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.black.withValues(alpha: 0.1),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.school_rounded, color: AppColors.purple, size: 22),
+                  SizedBox(width: 8),
+                  Text(
+                    'Semester Notes',
+                    style: TextStyle(
+                      fontSize: 19,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.white,
+                      letterSpacing: -0.3,
                     ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Select your semester below to view syllabus notes, course units, and student materials.',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.white.withValues(alpha: 0.7),
+                  height: 1.35,
                 ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 18),
 
-                // Search Results Bar (when searching)
-                Obx(() {
-                  final isFiltered = controller.searchQuery.value.trim().isNotEmpty;
-                  if (!isFiltered) return const SizedBox.shrink();
+        // Section Title
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Select Semester',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.text),
+            ),
+            Obx(() => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.grayFade(0.15)),
+              ),
+              child: Text(
+                '${controller.notes.length} Total Notes',
+                style: const TextStyle(fontSize: 11, color: AppColors.gray, fontWeight: FontWeight.w600),
+              ),
+            )),
+          ],
+        ),
+        const SizedBox(height: 14),
 
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.search_rounded, size: 16, color: AppColors.gray),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Found ${controller.filteredNotes.length} note${controller.filteredNotes.length == 1 ? '' : 's'}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.text,
+        // 8 Semester Boxes Grid
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 14,
+            mainAxisSpacing: 14,
+            childAspectRatio: 1.15,
+          ),
+          itemCount: controller.semesterBoxes.length,
+          itemBuilder: (context, index) {
+            final sem = controller.semesterBoxes[index];
+            final key = sem['key']!;
+            final title = sem['title']!;
+            final code = sem['code']!;
+
+            return Obx(() {
+              final count = controller.countForSemester(key);
+
+              return InkWell(
+                onTap: () => controller.enterSemester(key),
+                borderRadius: BorderRadius.circular(18),
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: AppColors.grayFade(0.12)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.black.withValues(alpha: 0.03),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Top Row: Code Badge + Icon
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: AppColors.purpleLight,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              code,
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.card,
+                              ),
+                            ),
                           ),
-                        ),
-                        const Spacer(),
-                        InkWell(
-                          onTap: controller.clearSearch,
-                          child: const Text(
-                            'Clear search',
+                          Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: AppColors.background,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.menu_book_rounded,
+                              size: 16,
+                              color: AppColors.card,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // Semester Name + Count
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.text,
+                              letterSpacing: -0.2,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '$count note${count == 1 ? '' : 's'}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.gray,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // Enter Link
+                      const Row(
+                        children: [
+                          Text(
+                            'Enter',
                             style: TextStyle(
                               fontSize: 12,
+                              fontWeight: FontWeight.w700,
                               color: AppColors.card,
-                              fontWeight: FontWeight.w800,
-                              decoration: TextDecoration.underline,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-              ],
+                          SizedBox(width: 4),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 14,
+                            color: AppColors.card,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  /// Inside semester view with Back Button, Search, and Notes list
+  Widget _buildInsideSemesterView(BuildContext context) {
+    final semKey = controller.currentSemester.value!;
+    final semInfo = controller.semesterBoxes.firstWhere(
+      (s) => s['key'] == semKey,
+      orElse: () => {'title': semKey, 'code': semKey},
+    );
+    final title = semInfo['title'] ?? semKey;
+
+    return Column(
+      children: [
+        // Inside Semester Top Bar with Back Button
+        Container(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            border: Border(bottom: BorderSide(color: AppColors.grayFade(0.12))),
+          ),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: controller.exitSemester,
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.grayFade(0.15)),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.arrow_back_rounded, size: 16, color: AppColors.card),
+                      SizedBox(width: 4),
+                      Text(
+                        'Semesters',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.card),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.text,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Obx(() => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.purpleLight,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${controller.filteredNotes.length} Notes',
+                  style: const TextStyle(fontSize: 11, color: AppColors.card, fontWeight: FontWeight.bold),
+                ),
+              )),
+            ],
+          ),
+        ),
+
+        // Search within this semester
+        Container(
+          padding: const EdgeInsets.fromLTRB(18, 10, 18, 10),
+          color: AppColors.white,
+          child: TextField(
+            controller: controller.searchController,
+            onChanged: controller.updateSearch,
+            style: const TextStyle(fontSize: 14, color: AppColors.text),
+            decoration: InputDecoration(
+              hintText: 'Search $title by title, subject, unit...',
+              hintStyle: const TextStyle(color: AppColors.gray, fontSize: 13),
+              prefixIcon: const Icon(Icons.search_rounded, color: AppColors.gray),
+              suffixIcon: Obx(() => controller.searchQuery.value.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear_rounded, color: AppColors.gray, size: 20),
+                      onPressed: controller.clearSearch,
+                    )
+                  : const SizedBox.shrink()),
+              filled: true,
+              fillColor: AppColors.background,
+              contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(color: AppColors.grayFade(0.15)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(color: AppColors.grayFade(0.15)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: AppColors.purple, width: 1.8),
+              ),
             ),
           ),
+        ),
 
-          // Notes List with RefreshIndicator
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value) {
-                return const Center(
-                  child: CircularProgressIndicator(color: AppColors.purple),
-                );
-              }
+        // Notes List with RefreshIndicator
+        Expanded(
+          child: Obx(() {
+            if (controller.isLoading.value) {
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.purple),
+              );
+            }
 
-              if (controller.errorMessage.value.isNotEmpty) {
-                return RefreshIndicator(
-                  color: AppColors.card,
-                  onRefresh: controller.fetchNotes,
-                  child: ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      SizedBox(height: MediaQuery.of(context).size.height * 0.16),
-                      Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/no_network_dog.svg',
-                              height: 140,
-                              fit: BoxFit.contain,
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Connection Issue',
-                              style: TextStyle(
-                                color: AppColors.text,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 32),
-                              child: Text(
-                                controller.errorMessage.value.contains('timed out') ||
-                                        controller.errorMessage.value.contains('SocketException')
-                                    ? 'Unable to reach the campus server. Check your connection.'
-                                    : controller.errorMessage.value,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(color: AppColors.gray, fontSize: 13),
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.card,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              ),
-                              icon: const Icon(Icons.refresh_rounded, size: 16),
-                              label: const Text('Try Again'),
-                              onPressed: controller.fetchNotes,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              final filteredNotes = controller.filteredNotes;
-              if (filteredNotes.isEmpty) {
-                return RefreshIndicator(
-                  color: AppColors.card,
-                  onRefresh: controller.fetchNotes,
-                  child: ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      SizedBox(height: MediaQuery.of(context).size.height * 0.2),
-                      Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration: const BoxDecoration(
-                                color: AppColors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.picture_as_pdf_outlined, size: 52, color: AppColors.gray),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              controller.searchQuery.value.trim().isNotEmpty
-                                  ? 'No notes matching "${controller.searchQuery.value.trim()}"'
-                                  : 'No notes uploaded yet',
-                              style: const TextStyle(color: AppColors.text, fontSize: 16, fontWeight: FontWeight.w700),
-                            ),
-                            const SizedBox(height: 6),
-                            const Text(
-                              'Tap "+ Upload Note" below to add PDF course materials.',
-                              style: TextStyle(color: AppColors.gray, fontSize: 13),
-                            ),
-                            if (controller.searchQuery.value.trim().isNotEmpty) ...[
-                              const SizedBox(height: 16),
-                              OutlinedButton.icon(
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: AppColors.card,
-                                  side: const BorderSide(color: AppColors.card),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                icon: const Icon(Icons.refresh_rounded, size: 16),
-                                label: const Text('Clear Search'),
-                                onPressed: controller.clearSearch,
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
+            if (controller.errorMessage.value.isNotEmpty) {
               return RefreshIndicator(
                 color: AppColors.card,
                 onRefresh: controller.fetchNotes,
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                  itemCount: filteredNotes.length,
-                  itemBuilder: (context, index) {
-                    final note = filteredNotes[index];
-                    return _buildNoteCard(note);
-                  },
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.16),
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/no_network_dog.svg',
+                            height: 140,
+                            fit: BoxFit.contain,
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Connection Issue',
+                            style: TextStyle(
+                              color: AppColors.text,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 32),
+                            child: Text(
+                              controller.errorMessage.value.contains('timed out') ||
+                                      controller.errorMessage.value.contains('SocketException')
+                                  ? 'Unable to reach the campus server. Check your connection.'
+                                  : controller.errorMessage.value,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: AppColors.gray, fontSize: 13),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.card,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            icon: const Icon(Icons.refresh_rounded, size: 16),
+                            label: const Text('Try Again'),
+                            onPressed: controller.fetchNotes,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               );
-            }),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColors.card,
-        foregroundColor: AppColors.white,
-        icon: const Icon(Icons.upload_file_rounded, color: AppColors.purple),
-        label: const Text('Upload Note', style: TextStyle(fontWeight: FontWeight.w700)),
-        onPressed: () => _showUploadBottomSheet(context),
-      ),
+            }
+
+            final filteredNotes = controller.filteredNotes;
+            if (filteredNotes.isEmpty) {
+              return RefreshIndicator(
+                color: AppColors.card,
+                onRefresh: controller.fetchNotes,
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.14),
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/no_events_dog.svg',
+                            height: 140,
+                            fit: BoxFit.contain,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            controller.searchQuery.value.trim().isNotEmpty
+                                ? 'No notes matching "${controller.searchQuery.value.trim()}"'
+                                : 'No notes in $title yet',
+                            style: const TextStyle(color: AppColors.text, fontSize: 16, fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            controller.searchQuery.value.trim().isNotEmpty
+                                ? 'Try searching by a different term or subject.'
+                                : 'Be the first to upload course materials for $title!\nTap "+ Upload Note" below to get started.',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: AppColors.gray, fontSize: 13),
+                          ),
+                          if (controller.searchQuery.value.trim().isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppColors.card,
+                                side: const BorderSide(color: AppColors.card),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              icon: const Icon(Icons.refresh_rounded, size: 16),
+                              label: const Text('Clear Search'),
+                              onPressed: controller.clearSearch,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return RefreshIndicator(
+              color: AppColors.card,
+              onRefresh: controller.fetchNotes,
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                itemCount: filteredNotes.length,
+                itemBuilder: (context, index) {
+                  final note = filteredNotes[index];
+                  return _buildNoteCard(note);
+                },
+              ),
+            );
+          }),
+        ),
+      ],
     );
   }
 
@@ -378,21 +618,16 @@ class NotesView extends GetView<NotesController> {
 
   void _showUploadBottomSheet(BuildContext context) {
     final titleController = TextEditingController();
+    final subjectController = TextEditingController();
     final unitController = TextEditingController(text: 'Unit 1');
-    final selectedSubject = 'Computer Science'.obs;
-    final selectedSemester = 'Semester 1'.obs;
+    final selectedSemester = (controller.currentSemester.value ??
+            (controller.selectedCategory.value != 'All'
+                ? controller.selectedCategory.value
+                : 'Semester 1'))
+        .obs;
     final Rx<File?> pickedFile = Rx<File?>(null);
     final RxString pickedFileName = ''.obs;
     final RxString pickedFileSize = ''.obs;
-
-    final subjects = [
-      'Computer Science',
-      'Data Structures',
-      'OS',
-      'Networks',
-      'Mathematics',
-      'General',
-    ];
 
     final semesters = [
       'Semester 1',
@@ -776,6 +1011,181 @@ class NotesView extends GetView<NotesController> {
                         ),
                 ),
               )),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  static void showSemestersModal(BuildContext context, NotesController controller) {
+    Get.bottomSheet(
+      SafeArea(
+        child: Container(
+          decoration: const BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.grayFade(0.3),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.school_rounded, color: AppColors.card, size: 22),
+                      SizedBox(width: 8),
+                      Text(
+                        'Semester Categories',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.text,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Obx(
+                    () => controller.selectedCategory.value != 'All'
+                        ? TextButton(
+                            onPressed: () {
+                              controller.selectCategory('All');
+                              Get.back();
+                            },
+                            child: const Text(
+                              'Reset to All',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.card,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Select a semester to explore or upload syllabus notes',
+                style: TextStyle(fontSize: 12, color: AppColors.gray),
+              ),
+              const SizedBox(height: 16),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: controller.categories.map((cat) {
+                      return Obx(() {
+                        final isSelected = controller.selectedCategory.value == cat;
+                        final count = controller.countForCategory(cat);
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.purpleLight
+                                : AppColors.background,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: isSelected
+                                  ? AppColors.card
+                                  : AppColors.grayFade(0.12),
+                              width: isSelected ? 1.5 : 1,
+                            ),
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 2,
+                            ),
+                            leading: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? AppColors.card
+                                    : AppColors.white,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              alignment: Alignment.center,
+                              child: cat == 'All'
+                                  ? Icon(
+                                      Icons.grid_view_rounded,
+                                      color: isSelected
+                                          ? AppColors.white
+                                          : AppColors.gray,
+                                      size: 18,
+                                    )
+                                  : Text(
+                                      cat.replaceAll('Semester ', 'S'),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w800,
+                                        color: isSelected
+                                            ? AppColors.purple
+                                            : AppColors.text,
+                                      ),
+                                    ),
+                            ),
+                            title: Text(
+                              cat == 'All' ? 'All Semesters' : cat,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: isSelected
+                                    ? FontWeight.w800
+                                    : FontWeight.w600,
+                                color: isSelected
+                                    ? AppColors.card
+                                    : AppColors.text,
+                              ),
+                            ),
+                            subtitle: Text(
+                              '$count note${count == 1 ? '' : 's'}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: isSelected
+                                    ? AppColors.card.withValues(alpha: 0.8)
+                                    : AppColors.gray,
+                              ),
+                            ),
+                            trailing: isSelected
+                                ? const Icon(
+                                    Icons.check_circle_rounded,
+                                    color: AppColors.card,
+                                    size: 22,
+                                  )
+                                : const Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: AppColors.gray,
+                                    size: 20,
+                                  ),
+                            onTap: () {
+                              controller.selectCategory(cat);
+                              Get.back();
+                            },
+                          ),
+                        );
+                      });
+                    }).toList(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
             ],
           ),
         ),
