@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../app/theme/app_theme.dart';
 import '../../../core/services/api_service.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../models/note_model.dart';
@@ -130,8 +131,8 @@ class NotesController extends GetxController {
           'Submitted for Approval 📋',
           response['message'] ?? '"${newNote.title}" uploaded! It will be visible after Admin approval.',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.indigo.shade50,
-          colorText: Colors.indigo.shade900,
+          backgroundColor: AppColors.card,
+          colorText: AppColors.white,
           margin: const EdgeInsets.all(16),
           duration: const Duration(seconds: 4),
         );
@@ -144,8 +145,8 @@ class NotesController extends GetxController {
         'Upload Failed',
         e.toString().replaceAll('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade900,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
         margin: const EdgeInsets.all(16),
         duration: const Duration(seconds: 4),
       );
@@ -161,8 +162,8 @@ class NotesController extends GetxController {
         'Error',
         'PDF URL not available for this note.',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade900,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
         margin: const EdgeInsets.all(16),
       );
       return;
@@ -184,8 +185,8 @@ class NotesController extends GetxController {
         'Could Not Open PDF',
         'Unable to open $fullUrl: $e',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.amber.shade50,
-        colorText: Colors.amber.shade900,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
         margin: const EdgeInsets.all(16),
       );
     }
@@ -200,8 +201,8 @@ class NotesController extends GetxController {
         'Downloading Note',
         'Starting download for "${note.title}"...',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.indigo.shade50,
-        colorText: Colors.indigo.shade900,
+        backgroundColor: AppColors.card,
+        colorText: AppColors.white,
         margin: const EdgeInsets.all(16),
         duration: const Duration(seconds: 2),
       );

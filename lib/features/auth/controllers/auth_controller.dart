@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../app/routes/app_routes.dart';
+import '../../../app/theme/app_theme.dart';
 import '../../../core/services/api_service.dart';
 import '../models/user_model.dart';
 
@@ -90,8 +91,8 @@ class AuthController extends GetxController {
       Get.snackbar(
         'Welcome to Circle!',
         'Account created successfully.',
-        backgroundColor: Colors.indigo.shade50,
-        colorText: Colors.indigo.shade900,
+        backgroundColor: AppColors.card,
+        colorText: AppColors.white,
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(16),
       );
@@ -102,8 +103,8 @@ class AuthController extends GetxController {
       Get.snackbar(
         'Registration Failed',
         errorMessage.value,
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade900,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(16),
       );
@@ -135,8 +136,8 @@ class AuthController extends GetxController {
       Get.snackbar(
         'Welcome Back',
         'Signed in as ${currentUser.value?.name ?? "Student"}',
-        backgroundColor: Colors.indigo.shade50,
-        colorText: Colors.indigo.shade900,
+        backgroundColor: AppColors.card,
+        colorText: AppColors.white,
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(16),
       );
@@ -147,8 +148,8 @@ class AuthController extends GetxController {
       Get.snackbar(
         'Sign In Failed',
         errorMessage.value,
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade900,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(16),
       );

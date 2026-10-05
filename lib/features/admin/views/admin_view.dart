@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../app/theme/app_theme.dart';
 import '../controllers/admin_controller.dart';
 import '../../notes/controllers/notes_controller.dart';
 import '../../notes/models/note_model.dart';
@@ -9,7 +10,7 @@ import '../../societies/models/society_model.dart';
 class AdminView extends StatelessWidget {
   const AdminView({super.key});
 
-  static const primaryIndigo = Colors.indigo;
+  static const primaryIndigo = AppColors.card;
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +25,9 @@ class AdminView extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: AppColors.background,
         appBar: AppBar(
-          backgroundColor: primaryIndigo,
+          backgroundColor: AppColors.card,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
@@ -46,7 +47,7 @@ class AdminView extends StatelessWidget {
               Text(
                 'Review & approve notes and societies',
                 style: TextStyle(
-                  color: Color(0xFFC7D2FE),
+                  color: AppColors.purple,
                   fontSize: 12,
                   fontWeight: FontWeight.w400,
                 ),
@@ -61,10 +62,10 @@ class AdminView extends StatelessWidget {
             ),
           ],
           bottom: TabBar(
-            indicatorColor: Colors.white,
+            indicatorColor: AppColors.purple,
             indicatorWeight: 3,
             labelColor: Colors.white,
-            unselectedLabelColor: Colors.indigo.shade200,
+            unselectedLabelColor: AppColors.gray,
             labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
             tabs: [
               Obx(() => Tab(
@@ -79,7 +80,7 @@ class AdminView extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                             decoration: BoxDecoration(
-                              color: Colors.red.shade500,
+                              color: AppColors.magenta,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
@@ -312,37 +313,37 @@ class AdminView extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Colors.indigo.shade50,
+                    color: AppColors.blueLight,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     note.subject,
                     style: const TextStyle(
-                        fontSize: 11, color: primaryIndigo, fontWeight: FontWeight.w600),
+                        fontSize: 11, color: AppColors.text, fontWeight: FontWeight.w700),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Colors.purple.shade50,
+                    color: AppColors.purpleLight,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     note.unit,
-                    style: TextStyle(
-                        fontSize: 11, color: Colors.purple.shade700, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                        fontSize: 11, color: AppColors.card, fontWeight: FontWeight.w700),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: AppColors.background,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     note.semester,
-                    style: TextStyle(
-                        fontSize: 11, color: Colors.grey.shade800, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                        fontSize: 11, color: AppColors.gray, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -357,13 +358,13 @@ class AdminView extends StatelessWidget {
                 // Preview PDF Button
                 OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: primaryIndigo,
-                    side: const BorderSide(color: primaryIndigo),
+                    foregroundColor: AppColors.card,
+                    side: BorderSide(color: AppColors.grayFade(0.3)),
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   icon: const Icon(Icons.visibility_rounded, size: 16),
-                  label: const Text('Preview PDF', style: TextStyle(fontSize: 12)),
+                  label: const Text('Preview PDF', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                   onPressed: () => notesController.openNotePdf(note),
                 ),
                 const Spacer(),
@@ -371,7 +372,7 @@ class AdminView extends StatelessWidget {
                 // Reject Button
                 TextButton.icon(
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.red.shade700,
+                    foregroundColor: AppColors.magenta,
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   ),
                   icon: const Icon(Icons.close_rounded, size: 16),
@@ -382,13 +383,13 @@ class AdminView extends StatelessWidget {
                       AlertDialog(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         title: const Text('Reject Note',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.magenta)),
                         content: Text('Are you sure you want to reject "${note.title}"?'),
                         actions: [
-                          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+                          TextButton(onPressed: () => Get.back(), child: const Text('Cancel', style: TextStyle(color: AppColors.gray))),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red, foregroundColor: Colors.white),
+                                backgroundColor: AppColors.magenta, foregroundColor: Colors.white),
                             onPressed: () {
                               Get.back();
                               controller.rejectNote(note.id);
@@ -405,8 +406,8 @@ class AdminView extends StatelessWidget {
                 // Approve Button
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade600,
-                    foregroundColor: Colors.white,
+                    backgroundColor: AppColors.green,
+                    foregroundColor: AppColors.black,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -552,7 +553,7 @@ class AdminView extends StatelessWidget {
                   width: 46,
                   height: 46,
                   decoration: BoxDecoration(
-                    color: Colors.indigo.shade50,
+                    color: AppColors.purpleLight,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(
@@ -561,7 +562,7 @@ class AdminView extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: primaryIndigo,
+                        color: AppColors.card,
                       ),
                     ),
                   ),
@@ -576,13 +577,13 @@ class AdminView extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: AppColors.text,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         '${soc.department} • ${soc.category}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                        style: const TextStyle(fontSize: 12, color: AppColors.gray),
                       ),
                     ],
                   ),
@@ -596,7 +597,7 @@ class AdminView extends StatelessWidget {
               soc.description,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade700, height: 1.3),
+              style: const TextStyle(fontSize: 13, color: AppColors.text, height: 1.3),
             ),
             const SizedBox(height: 10),
 
@@ -609,10 +610,10 @@ class AdminView extends StatelessWidget {
                   return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: AppColors.background,
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: Text(d, style: TextStyle(fontSize: 11, color: Colors.grey.shade800)),
+                    child: Text(d, style: const TextStyle(fontSize: 11, color: AppColors.gray)),
                   );
                 }).toList(),
               ),
@@ -628,13 +629,13 @@ class AdminView extends StatelessWidget {
                 // Links preview if available
                 if (soc.websiteLink.isNotEmpty)
                   IconButton(
-                    icon: const Icon(Icons.language_rounded, size: 20, color: primaryIndigo),
+                    icon: const Icon(Icons.language_rounded, size: 20, color: AppColors.card),
                     tooltip: 'Visit Website',
                     onPressed: () => societiesController.launchExternalUrl(soc.websiteLink),
                   ),
                 if (soc.registrationLink.isNotEmpty)
                   IconButton(
-                    icon: const Icon(Icons.link_rounded, size: 20, color: Colors.green),
+                    icon: const Icon(Icons.link_rounded, size: 20, color: AppColors.card),
                     tooltip: 'Join Link',
                     onPressed: () => societiesController.launchExternalUrl(soc.registrationLink),
                   ),
@@ -643,7 +644,7 @@ class AdminView extends StatelessWidget {
                 // Reject Button
                 TextButton.icon(
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.red.shade700,
+                    foregroundColor: AppColors.magenta,
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   ),
                   icon: const Icon(Icons.close_rounded, size: 16),
@@ -654,18 +655,18 @@ class AdminView extends StatelessWidget {
                       AlertDialog(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         title: const Text('Reject Society',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.magenta)),
                         content: Text('Are you sure you want to reject "${soc.name}"?'),
                         actions: [
-                          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+                          TextButton(onPressed: () => Get.back(), child: const Text('Cancel', style: TextStyle(color: AppColors.gray))),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red, foregroundColor: Colors.white),
+                                backgroundColor: AppColors.magenta, foregroundColor: Colors.white),
                             onPressed: () {
                               Get.back();
                               controller.rejectSociety(soc.id);
                             },
-                            child: const Text('Reject & Remove'),
+                            child: const Text('Reject & Delete'),
                           ),
                         ],
                       ),
@@ -677,8 +678,8 @@ class AdminView extends StatelessWidget {
                 // Approve Button
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade600,
-                    foregroundColor: Colors.white,
+                    backgroundColor: AppColors.green,
+                    foregroundColor: AppColors.black,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -716,7 +717,7 @@ class AdminView extends StatelessWidget {
               child: _buildStatTile(
                 title: 'Pending Notes',
                 value: '${stats['pendingNotes'] ?? controller.pendingNotes.length}',
-                color: Colors.amber.shade700,
+                color: AppColors.magenta,
                 icon: Icons.pending_actions_rounded,
               ),
             ),
@@ -725,7 +726,7 @@ class AdminView extends StatelessWidget {
               child: _buildStatTile(
                 title: 'Approved Notes',
                 value: '${stats['totalNotes'] ?? '0'}',
-                color: Colors.green.shade600,
+                color: AppColors.green,
                 icon: Icons.check_circle_outline_rounded,
               ),
             ),
@@ -738,7 +739,7 @@ class AdminView extends StatelessWidget {
               child: _buildStatTile(
                 title: 'Pending Societies',
                 value: '${stats['pendingSocieties'] ?? controller.pendingSocieties.length}',
-                color: Colors.orange.shade700,
+                color: AppColors.pink,
                 icon: Icons.group_add_rounded,
               ),
             ),
@@ -747,7 +748,7 @@ class AdminView extends StatelessWidget {
               child: _buildStatTile(
                 title: 'Active Societies',
                 value: '${stats['totalSocieties'] ?? '0'}',
-                color: primaryIndigo,
+                color: AppColors.card,
                 icon: Icons.groups_rounded,
               ),
             ),
@@ -757,7 +758,7 @@ class AdminView extends StatelessWidget {
         _buildStatTile(
           title: 'Registered Users & Students',
           value: '${stats['totalUsers'] ?? '0'}',
-          color: Colors.purple.shade700,
+          color: AppColors.purple,
           icon: Icons.people_outline_rounded,
         ),
         const SizedBox(height: 20),
@@ -766,20 +767,20 @@ class AdminView extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.indigo.shade50.withValues(alpha: 0.5),
+            color: AppColors.purpleLight.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.indigo.shade100),
+            border: Border.all(color: AppColors.purple.withValues(alpha: 0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Row(
                 children: [
-                  Icon(Icons.shield_outlined, color: primaryIndigo, size: 20),
+                  Icon(Icons.shield_outlined, color: AppColors.card, size: 20),
                   SizedBox(width: 8),
                   Text(
                     'Admin Workflow Guidelines',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: primaryIndigo),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.card),
                   ),
                 ],
               ),

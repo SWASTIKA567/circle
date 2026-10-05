@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../app/theme/app_theme.dart';
 import '../controllers/societies_controller.dart';
 import '../models/society_model.dart';
 import '../../auth/controllers/auth_controller.dart';
@@ -7,25 +8,25 @@ import '../../auth/controllers/auth_controller.dart';
 class SocietiesView extends GetView<SocietiesController> {
   const SocietiesView({super.key});
 
-  static const primaryIndigo = Colors.indigo;
+  static const primaryIndigo = AppColors.card;
 
   @override
   Widget build(BuildContext context) {
     final authController = Get.find<AuthController>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: Column(
         children: [
           // Header & Search Area
           Container(
-            padding: const EdgeInsets.fromLTRB(18, 14, 18, 10),
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(bottom: BorderSide(color: Colors.indigo.shade50)),
+              color: AppColors.white,
+              border: Border(bottom: BorderSide(color: AppColors.grayFade(0.12))),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
+                  color: AppColors.black.withValues(alpha: 0.02),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -41,16 +42,10 @@ class SocietiesView extends GetView<SocietiesController> {
                   return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: isSocietyMember
-                            ? [Colors.indigo.shade700, Colors.indigo.shade900]
-                            : [Colors.indigo.shade50, Colors.white],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      color: isSocietyMember ? AppColors.card : AppColors.background,
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                        color: isSocietyMember ? Colors.indigo.shade800 : Colors.indigo.shade100,
+                        color: isSocietyMember ? AppColors.card : AppColors.grayFade(0.18),
                       ),
                     ),
                     child: Row(
@@ -58,11 +53,11 @@ class SocietiesView extends GetView<SocietiesController> {
                         CircleAvatar(
                           radius: 20,
                           backgroundColor: isSocietyMember
-                              ? Colors.white.withValues(alpha: 0.2)
-                              : Colors.indigo.shade100,
+                              ? AppColors.purpleLight
+                              : AppColors.white,
                           child: Icon(
                             isSocietyMember ? Icons.verified_rounded : Icons.groups_rounded,
-                            color: isSocietyMember ? Colors.white : primaryIndigo,
+                            color: isSocietyMember ? AppColors.card : AppColors.gray,
                             size: 22,
                           ),
                         ),
@@ -78,7 +73,7 @@ class SocietiesView extends GetView<SocietiesController> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  color: isSocietyMember ? Colors.white : primaryIndigo,
+                                  color: isSocietyMember ? AppColors.white : AppColors.text,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -89,8 +84,8 @@ class SocietiesView extends GetView<SocietiesController> {
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: isSocietyMember
-                                      ? Colors.white.withValues(alpha: 0.85)
-                                      : Colors.grey.shade600,
+                                      ? AppColors.white.withValues(alpha: 0.7)
+                                      : AppColors.gray,
                                 ),
                               ),
                             ],
@@ -106,30 +101,31 @@ class SocietiesView extends GetView<SocietiesController> {
                 TextField(
                   controller: controller.searchController,
                   onChanged: controller.updateSearch,
+                  style: const TextStyle(fontSize: 14, color: AppColors.text),
                   decoration: InputDecoration(
                     hintText: 'Search societies, domains, department...',
-                    hintStyle: TextStyle(color: Colors.indigo.shade200, fontSize: 13.5),
-                    prefixIcon: const Icon(Icons.search_rounded, color: primaryIndigo),
+                    hintStyle: const TextStyle(color: AppColors.gray, fontSize: 13),
+                    prefixIcon: const Icon(Icons.search_rounded, color: AppColors.gray),
                     suffixIcon: Obx(() => controller.searchQuery.value.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, color: Colors.grey, size: 20),
+                            icon: const Icon(Icons.clear_rounded, color: AppColors.gray, size: 20),
                             onPressed: controller.clearSearch,
                           )
                         : const SizedBox.shrink()),
                     filled: true,
-                    fillColor: Colors.indigo.shade50.withValues(alpha: 0.35),
+                    fillColor: AppColors.background,
                     contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: Colors.indigo.shade100),
+                      borderSide: BorderSide(color: AppColors.grayFade(0.15)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: Colors.indigo.shade100),
+                      borderSide: BorderSide(color: AppColors.grayFade(0.15)),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(color: primaryIndigo, width: 1.8),
+                    focusedBorder: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(14)),
+                      borderSide: BorderSide(color: AppColors.purple, width: 1.8),
                     ),
                   ),
                 ),
@@ -151,16 +147,16 @@ class SocietiesView extends GetView<SocietiesController> {
                           label: Text(cat),
                           selected: isSelected,
                           labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : primaryIndigo,
+                            color: isSelected ? AppColors.white : AppColors.gray,
                             fontSize: 12,
                             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                           ),
-                          selectedColor: primaryIndigo,
-                          backgroundColor: Colors.indigo.shade50.withValues(alpha: 0.4),
+                          selectedColor: AppColors.card,
+                          backgroundColor: AppColors.background,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(18),
                             side: BorderSide(
-                              color: isSelected ? primaryIndigo : Colors.indigo.shade100,
+                              color: isSelected ? AppColors.card : AppColors.grayFade(0.15),
                             ),
                           ),
                           showCheckmark: false,
@@ -180,13 +176,13 @@ class SocietiesView extends GetView<SocietiesController> {
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator(color: primaryIndigo));
+                return const Center(child: CircularProgressIndicator(color: AppColors.purple));
               }
 
               final filtered = controller.filteredSocieties;
               if (filtered.isEmpty) {
                 return RefreshIndicator(
-                  color: primaryIndigo,
+                  color: AppColors.card,
                   onRefresh: controller.fetchSocieties,
                   child: ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -197,19 +193,19 @@ class SocietiesView extends GetView<SocietiesController> {
                           children: [
                             Container(
                               padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.indigo.shade50,
+                              decoration: const BoxDecoration(
+                                color: AppColors.white,
                                 shape: BoxShape.circle,
                               ),
-                              child: Icon(Icons.groups_outlined, size: 52, color: primaryIndigo.shade400),
+                              child: const Icon(Icons.groups_outlined, size: 52, color: AppColors.gray),
                             ),
                             const SizedBox(height: 16),
                             Text(
                               controller.searchQuery.value.trim().isNotEmpty
                                   ? 'No societies matching "${controller.searchQuery.value.trim()}"'
                                   : 'No societies listed yet',
-                              style: TextStyle(
-                                color: Colors.grey.shade800,
+                              style: const TextStyle(
+                                color: AppColors.text,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -219,14 +215,14 @@ class SocietiesView extends GetView<SocietiesController> {
                               authController.currentUser.value?.isSocietyMember == true
                                   ? 'Tap "+ Create Society" below to register your club.'
                                   : 'Societies and campus clubs will appear here.',
-                              style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+                              style: const TextStyle(color: AppColors.gray, fontSize: 13),
                             ),
                             if (controller.searchQuery.value.trim().isNotEmpty) ...[
                               const SizedBox(height: 14),
                               OutlinedButton.icon(
                                 style: OutlinedButton.styleFrom(
-                                  foregroundColor: primaryIndigo,
-                                  side: const BorderSide(color: primaryIndigo),
+                                  foregroundColor: AppColors.card,
+                                  side: const BorderSide(color: AppColors.card),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -245,7 +241,7 @@ class SocietiesView extends GetView<SocietiesController> {
               }
 
               return RefreshIndicator(
-                color: primaryIndigo,
+                color: AppColors.card,
                 onRefresh: controller.fetchSocieties,
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
@@ -261,10 +257,10 @@ class SocietiesView extends GetView<SocietiesController> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: primaryIndigo,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Create Society', style: TextStyle(fontWeight: FontWeight.w600)),
+        backgroundColor: AppColors.card,
+        foregroundColor: AppColors.white,
+        icon: const Icon(Icons.add_rounded, color: AppColors.purple),
+        label: const Text('Create Society', style: TextStyle(fontWeight: FontWeight.w700)),
         onPressed: () => _handleCreateSocietyPressed(context, authController),
       ),
     );
@@ -315,12 +311,12 @@ class SocietiesView extends GetView<SocietiesController> {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.indigo.shade100),
+        border: Border.all(color: AppColors.grayFade(0.12)),
         boxShadow: [
           BoxShadow(
-            color: Colors.indigo.withValues(alpha: 0.04),
+            color: AppColors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -338,7 +334,7 @@ class SocietiesView extends GetView<SocietiesController> {
                   width: 46,
                   height: 46,
                   decoration: BoxDecoration(
-                    color: Colors.indigo.shade50,
+                    color: AppColors.purpleLight,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(
@@ -347,7 +343,7 @@ class SocietiesView extends GetView<SocietiesController> {
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: primaryIndigo,
+                        color: AppColors.card,
                       ),
                     ),
                   ),
@@ -362,7 +358,7 @@ class SocietiesView extends GetView<SocietiesController> {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87,
+                          color: AppColors.text,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -371,14 +367,14 @@ class SocietiesView extends GetView<SocietiesController> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: Colors.indigo.shade50,
+                              color: AppColors.blueLight,
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               soc.department,
                               style: const TextStyle(
                                 fontSize: 11,
-                                color: primaryIndigo,
+                                color: AppColors.card,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -387,14 +383,14 @@ class SocietiesView extends GetView<SocietiesController> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: Colors.purple.shade50,
+                              color: AppColors.purpleLight,
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               soc.category,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 11,
-                                color: Colors.purple.shade700,
+                                color: AppColors.card,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -549,7 +545,7 @@ class SocietiesView extends GetView<SocietiesController> {
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: Colors.indigo.shade50,
+                      color: AppColors.purpleLight,
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Center(
@@ -558,7 +554,7 @@ class SocietiesView extends GetView<SocietiesController> {
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: primaryIndigo,
+                          color: AppColors.card,
                         ),
                       ),
                     ),
@@ -570,7 +566,7 @@ class SocietiesView extends GetView<SocietiesController> {
                       children: [
                         Text(
                           soc.name,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.black87),
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.text),
                         ),
                         const SizedBox(height: 4),
                         Row(
@@ -578,24 +574,24 @@ class SocietiesView extends GetView<SocietiesController> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: Colors.indigo.shade50,
+                                color: AppColors.blueLight,
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 soc.department,
-                                style: const TextStyle(fontSize: 11, color: primaryIndigo, fontWeight: FontWeight.w600),
+                                style: const TextStyle(fontSize: 11, color: AppColors.card, fontWeight: FontWeight.w600),
                               ),
                             ),
                             const SizedBox(width: 6),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: Colors.purple.shade50,
+                                color: AppColors.purpleLight,
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 soc.category,
-                                style: TextStyle(fontSize: 11, color: Colors.purple.shade700, fontWeight: FontWeight.w600),
+                                style: const TextStyle(fontSize: 11, color: AppColors.card, fontWeight: FontWeight.w600),
                               ),
                             ),
                           ],
@@ -608,17 +604,17 @@ class SocietiesView extends GetView<SocietiesController> {
               const SizedBox(height: 16),
 
               // Description
-              const Text('About Society', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+              const Text('About Society', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.text)),
               const SizedBox(height: 6),
               Text(
                 soc.description,
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade800, height: 1.4),
+                style: const TextStyle(fontSize: 13, color: AppColors.text, height: 1.4),
               ),
               const SizedBox(height: 16),
 
               // Domains
               if (soc.domains.isNotEmpty) ...[
-                const Text('Domains & Focus Areas', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                const Text('Domains & Focus Areas', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.text)),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -627,13 +623,13 @@ class SocietiesView extends GetView<SocietiesController> {
                     return Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.indigo.shade50,
+                        color: AppColors.background,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.indigo.shade100),
+                        border: Border.all(color: AppColors.grayFade(0.15)),
                       ),
                       child: Text(
                         d,
-                        style: const TextStyle(fontSize: 12, color: primaryIndigo, fontWeight: FontWeight.w600),
+                        style: const TextStyle(fontSize: 12, color: AppColors.gray, fontWeight: FontWeight.w600),
                       ),
                     );
                   }).toList(),
@@ -643,7 +639,7 @@ class SocietiesView extends GetView<SocietiesController> {
 
               // External Links (Website & Registration)
               if (soc.websiteLink.isNotEmpty || soc.registrationLink.isNotEmpty) ...[
-                const Text('Official Links', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                const Text('Official Links', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.text)),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -651,8 +647,8 @@ class SocietiesView extends GetView<SocietiesController> {
                       Expanded(
                         child: OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: primaryIndigo,
-                            side: const BorderSide(color: primaryIndigo),
+                            foregroundColor: AppColors.card,
+                            side: BorderSide(color: AppColors.grayFade(0.3)),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           icon: const Icon(Icons.language_rounded, size: 18),
@@ -666,12 +662,13 @@ class SocietiesView extends GetView<SocietiesController> {
                       Expanded(
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green.shade700,
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppColors.green,
+                            foregroundColor: AppColors.black,
+                            elevation: 0,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
-                          label: const Text('Join / Register'),
+                          label: const Text('Join / Register', style: TextStyle(fontWeight: FontWeight.bold)),
                           onPressed: () => controller.launchExternalUrl(soc.registrationLink),
                         ),
                       ),
@@ -682,11 +679,11 @@ class SocietiesView extends GetView<SocietiesController> {
 
               // Upcoming Events
               if (soc.upcomingEvents.isNotEmpty) ...[
-                Row(
+                const Row(
                   children: [
-                    Icon(Icons.upcoming_rounded, size: 18, color: Colors.amber.shade800),
-                    const SizedBox(width: 6),
-                    const Text('Upcoming Events', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                    Icon(Icons.upcoming_rounded, size: 18, color: AppColors.card),
+                    SizedBox(width: 6),
+                    Text('Upcoming Events', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.text)),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -695,9 +692,9 @@ class SocietiesView extends GetView<SocietiesController> {
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.amber.shade50.withValues(alpha: 0.5),
+                      color: AppColors.purpleLight,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.amber.shade200),
+                      border: Border.all(color: AppColors.purple.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -707,22 +704,22 @@ class SocietiesView extends GetView<SocietiesController> {
                           children: [
                             Text(
                               evt.title,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.amber.shade900,
+                                color: AppColors.card,
                               ),
                             ),
                             if (evt.date.isNotEmpty)
                               Text(
                                 evt.date,
-                                style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
+                                style: const TextStyle(fontSize: 11, color: AppColors.gray),
                               ),
                           ],
                         ),
                         if (evt.description.isNotEmpty) ...[
                           const SizedBox(height: 4),
-                          Text(evt.description, style: TextStyle(fontSize: 12, color: Colors.grey.shade800)),
+                          Text(evt.description, style: const TextStyle(fontSize: 12, color: AppColors.text)),
                         ],
                         if (evt.registrationLink.isNotEmpty) ...[
                           const SizedBox(height: 8),
@@ -730,7 +727,7 @@ class SocietiesView extends GetView<SocietiesController> {
                             alignment: Alignment.centerRight,
                             child: TextButton.icon(
                               style: TextButton.styleFrom(
-                                foregroundColor: primaryIndigo,
+                                foregroundColor: AppColors.card,
                                 padding: EdgeInsets.zero,
                               ),
                               icon: const Icon(Icons.open_in_new_rounded, size: 14),
@@ -748,11 +745,11 @@ class SocietiesView extends GetView<SocietiesController> {
 
               // Recent Events
               if (soc.recentEvents.isNotEmpty) ...[
-                Row(
+                const Row(
                   children: [
-                    Icon(Icons.history_edu_rounded, size: 18, color: Colors.indigo.shade700),
-                    const SizedBox(width: 6),
-                    const Text('Past / Recent Events', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                    Icon(Icons.history_edu_rounded, size: 18, color: AppColors.card),
+                    SizedBox(width: 6),
+                    Text('Past / Recent Events', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.text)),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -834,14 +831,14 @@ class SocietiesView extends GetView<SocietiesController> {
                   onPressed: () => isPasswordHidden.toggle(),
                 ),
                 filled: true,
-                fillColor: Colors.grey.shade50,
+                fillColor: AppColors.background,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.indigo.shade100),
+                  borderSide: BorderSide(color: AppColors.grayFade(0.18)),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.indigo.shade100),
+                  borderSide: BorderSide(color: AppColors.grayFade(0.18)),
                 ),
               ),
             )),
@@ -850,11 +847,11 @@ class SocietiesView extends GetView<SocietiesController> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: const Text('Cancel', style: TextStyle(color: AppColors.gray)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: primaryIndigo,
+              backgroundColor: AppColors.card,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
@@ -924,7 +921,7 @@ class SocietiesView extends GetView<SocietiesController> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: AppColors.grayFade(0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -937,15 +934,15 @@ class SocietiesView extends GetView<SocietiesController> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.indigo.shade50,
+                      color: AppColors.purpleLight,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.add_business_rounded, color: primaryIndigo),
+                    child: const Icon(Icons.add_business_rounded, color: AppColors.card),
                   ),
                   const SizedBox(width: 12),
                   const Text(
                     'Create New Society',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.black87),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.text),
                   ),
                 ],
               ),
@@ -955,20 +952,20 @@ class SocietiesView extends GetView<SocietiesController> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.indigo.shade50.withValues(alpha: 0.35),
+                  color: AppColors.purpleLight.withValues(alpha: 0.35),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.indigo.shade100),
+                  border: Border.all(color: AppColors.purple.withValues(alpha: 0.3)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.star_rounded, size: 16, color: Colors.red.shade700),
+                        const Icon(Icons.star_rounded, size: 16, color: AppColors.magenta),
                         const SizedBox(width: 6),
                         const Text(
                           'Mandatory Details',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87),
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.text),
                         ),
                       ],
                     ),
@@ -1025,11 +1022,11 @@ class SocietiesView extends GetView<SocietiesController> {
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.indigo.shade100),
+                          borderSide: BorderSide(color: AppColors.grayFade(0.18)),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.indigo.shade100),
+                          borderSide: BorderSide(color: AppColors.grayFade(0.18)),
                         ),
                       ),
                     )),
@@ -1039,18 +1036,18 @@ class SocietiesView extends GetView<SocietiesController> {
               const SizedBox(height: 16),
 
               // --- Optional Details Section ---
-              const Text('Optional Details', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+              const Text('Optional Details', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.text)),
               const SizedBox(height: 10),
 
               // Category Selector
-              const Text('Category', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+              const Text('Category', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.text)),
               const SizedBox(height: 4),
               Obx(() => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
+                  color: AppColors.background,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.indigo.shade100),
+                  border: Border.all(color: AppColors.grayFade(0.18)),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
@@ -1272,16 +1269,16 @@ class SocietiesView extends GetView<SocietiesController> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.indigo.shade50,
+                      color: AppColors.purpleLight,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.edit_note_rounded, color: primaryIndigo),
+                    child: const Icon(Icons.edit_note_rounded, color: AppColors.card),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       'Edit "${soc.name}"',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.black87),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.text),
                     ),
                   ),
                 ],
@@ -1295,14 +1292,14 @@ class SocietiesView extends GetView<SocietiesController> {
               const SizedBox(height: 10),
 
               // Category
-              const Text('Category', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+              const Text('Category', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.text)),
               const SizedBox(height: 4),
               Obx(() => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
+                  color: AppColors.background,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.indigo.shade100),
+                  border: Border.all(color: AppColors.grayFade(0.18)),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
@@ -1332,14 +1329,14 @@ class SocietiesView extends GetView<SocietiesController> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.indigo.shade50.withValues(alpha: 0.3),
+                  color: AppColors.purpleLight.withValues(alpha: 0.35),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.indigo.shade100),
+                  border: Border.all(color: AppColors.purple.withValues(alpha: 0.3)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Add an Event', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                    const Text('Add an Event', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.text)),
                     const SizedBox(height: 6),
                     Obx(() => Row(
                       children: [
@@ -1463,28 +1460,29 @@ class SocietiesView extends GetView<SocietiesController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87)),
+        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.text)),
         const SizedBox(height: 4),
         TextField(
           controller: controller,
           maxLines: maxLines,
+          style: const TextStyle(fontSize: 14, color: AppColors.text),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+            hintStyle: const TextStyle(color: AppColors.gray, fontSize: 13),
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: AppColors.background,
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.indigo.shade100),
+              borderSide: BorderSide(color: AppColors.grayFade(0.18)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.indigo.shade100),
+              borderSide: BorderSide(color: AppColors.grayFade(0.18)),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: primaryIndigo, width: 1.6),
+            focusedBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderSide: BorderSide(color: AppColors.purple, width: 1.6),
             ),
           ),
         ),
