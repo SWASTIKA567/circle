@@ -59,9 +59,14 @@ class AppTheme {
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.white,
         indicatorColor: AppColors.purpleLight,
-        labelTextStyle: WidgetStateProperty.all(
-          const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.text),
-        ),
+        elevation: 0,
+        height: 64,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.card);
+          }
+          return const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppColors.gray);
+        }),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.purple,

@@ -508,9 +508,9 @@ class NotesView extends GetView<NotesController> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(color: AppColors.grayFade(0.2)),
                   ),
-                  focusedBorder: const OutlineInputBorder(
+                  focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: AppColors.purple, width: 1.6),
+                    borderSide: const BorderSide(color: AppColors.purple, width: 1.6),
                   ),
                 ),
               ),
@@ -539,9 +539,9 @@ class NotesView extends GetView<NotesController> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(color: AppColors.grayFade(0.2)),
                   ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius:  BorderRadius.circular(12),
-                    borderSide: BorderSide(color: AppColors.purple, width: 1.6),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.purple, width: 1.6),
                   ),
                 ),
               ),

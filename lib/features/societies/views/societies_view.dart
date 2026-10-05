@@ -276,7 +276,7 @@ class SocietiesView extends GetView<SocietiesController> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
           title: Row(
             children: [
-              Icon(Icons.shield_outlined, color: Colors.amber.shade800),
+              Icon(Icons.shield_outlined, color: AppColors.purple),
               const SizedBox(width: 8),
               const Text('Member Only', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ],
@@ -441,23 +441,23 @@ class SocietiesView extends GetView<SocietiesController> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
+                  color: AppColors.pinkLight.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.amber.shade200),
+                  border: Border.all(color: AppColors.pink),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.event_rounded, size: 16, color: Colors.amber.shade900),
+                    Icon(Icons.event_rounded, size: 16, color: AppColors.magenta),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         'Upcoming: ${soc.upcomingEvents.first.title}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Colors.amber.shade900,
+                          color: AppColors.magenta,
                         ),
                       ),
                     ),

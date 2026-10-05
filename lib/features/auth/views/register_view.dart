@@ -188,7 +188,7 @@ class _RegisterViewState extends State<RegisterView> {
                         color: _isSocietyMember.value ? AppColors.card : AppColors.gray,
                         size: 26,
                       ),
-                      activeColor: AppColors.purple,
+                      activeThumbColor: AppColors.purple,
                       activeTrackColor: AppColors.card,
                       value: _isSocietyMember.value,
                       onChanged: (val) => _isSocietyMember.value = val,

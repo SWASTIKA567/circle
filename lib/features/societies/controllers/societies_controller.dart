@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../app/theme/app_theme.dart';
 import '../../../core/services/api_service.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../models/society_model.dart';
@@ -132,8 +133,8 @@ class SocietiesController extends GetxController {
           'Submitted for Approval 📋',
           response['message'] ?? '"${newSociety.name}" registered! It will be visible after Admin approval.',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.indigo.shade50,
-          colorText: Colors.indigo.shade900,
+          backgroundColor: AppColors.card,
+          colorText: AppColors.white,
           margin: const EdgeInsets.all(16),
           duration: const Duration(seconds: 4),
         );
@@ -146,8 +147,8 @@ class SocietiesController extends GetxController {
         'Creation Failed',
         e.toString().replaceAll('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade900,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
         margin: const EdgeInsets.all(16),
         duration: const Duration(seconds: 4),
       );
@@ -174,8 +175,8 @@ class SocietiesController extends GetxController {
         'Verification Failed',
         e.toString().replaceAll('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade900,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
         margin: const EdgeInsets.all(16),
       );
       return false;
@@ -247,8 +248,8 @@ class SocietiesController extends GetxController {
           'Updated Successfully',
           '"${updatedSociety.name}" details updated successfully.',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.indigo.shade50,
-          colorText: Colors.indigo.shade900,
+          backgroundColor: AppColors.card,
+          colorText: AppColors.white,
           margin: const EdgeInsets.all(16),
         );
         return true;
@@ -260,8 +261,8 @@ class SocietiesController extends GetxController {
         'Update Failed',
         e.toString().replaceAll('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade900,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
         margin: const EdgeInsets.all(16),
       );
       return false;
@@ -291,8 +292,8 @@ class SocietiesController extends GetxController {
         'Could Not Open Link',
         'Unable to open $url: $e',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.amber.shade50,
-        colorText: Colors.amber.shade900,
+        backgroundColor: AppColors.card,
+        colorText: AppColors.white,
         margin: const EdgeInsets.all(16),
       );
     }

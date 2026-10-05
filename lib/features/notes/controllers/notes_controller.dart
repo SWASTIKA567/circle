@@ -218,8 +218,8 @@ class NotesController extends GetxController {
         'Download Error',
         'Could not initiate download: $e',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade900,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
         margin: const EdgeInsets.all(16),
       );
     }

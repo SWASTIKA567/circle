@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../app/theme/app_theme.dart';
 import '../../../core/services/api_service.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../../notes/controllers/notes_controller.dart';
@@ -100,8 +101,8 @@ class AdminController extends GetxController {
         Get.snackbar(
           'Note Approved ✅',
           response['message'] ?? 'Note is now publicly visible to all students.',
-          backgroundColor: Colors.green.shade50,
-          colorText: Colors.green.shade900,
+          backgroundColor: AppColors.greenLight,
+          colorText: AppColors.card,
           snackPosition: SnackPosition.BOTTOM,
           margin: const EdgeInsets.all(16),
           duration: const Duration(seconds: 3),
@@ -111,8 +112,8 @@ class AdminController extends GetxController {
       Get.snackbar(
         'Approval Failed',
         e.toString().replaceAll('Exception: ', ''),
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade900,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(16),
       );
@@ -136,8 +137,8 @@ class AdminController extends GetxController {
         Get.snackbar(
           'Note Rejected 🗑️',
           response['message'] ?? 'Note was removed from approval queue.',
-          backgroundColor: Colors.orange.shade50,
-          colorText: Colors.orange.shade900,
+          backgroundColor: AppColors.pinkLight,
+          colorText: AppColors.magenta,
           snackPosition: SnackPosition.BOTTOM,
           margin: const EdgeInsets.all(16),
           duration: const Duration(seconds: 3),
@@ -147,8 +148,8 @@ class AdminController extends GetxController {
       Get.snackbar(
         'Rejection Failed',
         e.toString().replaceAll('Exception: ', ''),
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade900,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(16),
       );
@@ -176,8 +177,8 @@ class AdminController extends GetxController {
         Get.snackbar(
           'Society Approved ✅',
           response['message'] ?? 'Society is now visible in campus clubs.',
-          backgroundColor: Colors.green.shade50,
-          colorText: Colors.green.shade900,
+          backgroundColor: AppColors.greenLight,
+          colorText: AppColors.card,
           snackPosition: SnackPosition.BOTTOM,
           margin: const EdgeInsets.all(16),
           duration: const Duration(seconds: 3),
@@ -187,8 +188,8 @@ class AdminController extends GetxController {
       Get.snackbar(
         'Approval Failed',
         e.toString().replaceAll('Exception: ', ''),
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade900,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(16),
       );
@@ -213,8 +214,8 @@ class AdminController extends GetxController {
         Get.snackbar(
           'Society Rejected 🗑️',
           response['message'] ?? 'Society request was removed.',
-          backgroundColor: Colors.orange.shade50,
-          colorText: Colors.orange.shade900,
+          backgroundColor: AppColors.pinkLight,
+          colorText: AppColors.magenta,
           snackPosition: SnackPosition.BOTTOM,
           margin: const EdgeInsets.all(16),
           duration: const Duration(seconds: 3),
@@ -224,8 +225,8 @@ class AdminController extends GetxController {
       Get.snackbar(
         'Rejection Failed',
         e.toString().replaceAll('Exception: ', ''),
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade900,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(16),
       );

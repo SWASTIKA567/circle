@@ -247,7 +247,7 @@ class HomeView extends GetView<HomeController> {
         index: controller.currentIndex.value,
         children: tabs,
       )),
-      bottomNavigationBar: Obx(() => Container(
+      bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppColors.white,
           boxShadow: [
@@ -259,35 +259,42 @@ class HomeView extends GetView<HomeController> {
           ],
           border: Border(top: BorderSide(color: AppColors.grayFade(0.12))),
         ),
-        child: NavigationBar(
-          selectedIndex: controller.currentIndex.value,
-          onDestinationSelected: (index) => controller.currentIndex.value = index,
-          backgroundColor: AppColors.white,
-          indicatorColor: AppColors.purpleLight,
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.home_outlined, color: AppColors.gray),
-              selectedIcon: Icon(Icons.home_rounded, color: AppColors.card),
-              label: 'Home',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.menu_book_outlined, color: AppColors.gray),
-              selectedIcon: Icon(Icons.menu_book_rounded, color: AppColors.card),
-              label: 'Notes',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.smart_toy_outlined, color: AppColors.gray),
-              selectedIcon: Icon(Icons.smart_toy_rounded, color: AppColors.card),
-              label: 'Chatbot',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.groups_outlined, color: AppColors.gray),
-              selectedIcon: Icon(Icons.groups_rounded, color: AppColors.card),
-              label: 'Societies',
-            ),
-          ],
+        child: SafeArea(
+          top: false,
+          maintainBottomViewPadding: true,
+          child: Obx(() => NavigationBar(
+            height: 64,
+            elevation: 0,
+            selectedIndex: controller.currentIndex.value,
+            onDestinationSelected: (index) => controller.currentIndex.value = index,
+            backgroundColor: AppColors.white,
+            indicatorColor: AppColors.purpleLight,
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.home_outlined, color: AppColors.gray),
+                selectedIcon: Icon(Icons.home_rounded, color: AppColors.card),
+                label: 'Home',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.menu_book_outlined, color: AppColors.gray),
+                selectedIcon: Icon(Icons.menu_book_rounded, color: AppColors.card),
+                label: 'Notes',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.smart_toy_outlined, color: AppColors.gray),
+                selectedIcon: Icon(Icons.smart_toy_rounded, color: AppColors.card),
+                label: 'Chatbot',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.groups_outlined, color: AppColors.gray),
+                selectedIcon: Icon(Icons.groups_rounded, color: AppColors.card),
+                label: 'Societies',
+              ),
+            ],
+          )),
         ),
-      )),
+      ),
     );
   }
 }

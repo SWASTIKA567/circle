@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../features/auth/controllers/auth_controller.dart';
@@ -26,14 +27,18 @@ class SplashController extends GetxController {
 
       await Future.delayed(const Duration(milliseconds: 500));
 
-      if (isLoggedIn) {
-        Get.offAllNamed(Routes.HOME);
-      } else {
-        Get.offAllNamed(Routes.LOGIN);
-      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (isLoggedIn) {
+          Get.offAllNamed(Routes.HOME);
+        } else {
+          Get.offAllNamed(Routes.LOGIN);
+        }
+      });
     } catch (_) {
       // Guaranteed safety fallback to Login Screen
-      Get.offAllNamed(Routes.LOGIN);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.offAllNamed(Routes.LOGIN);
+      });
     }
   }
 }

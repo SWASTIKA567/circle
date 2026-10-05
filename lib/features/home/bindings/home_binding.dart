@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import '../../auth/controllers/auth_controller.dart';
-import '../../auth/bindings/auth_binding.dart';
 import '../controllers/home_controller.dart';
 import '../../events/controllers/events_controller.dart';
 import '../../notes/controllers/notes_controller.dart';
@@ -12,7 +11,7 @@ class HomeBinding extends Bindings {
   void dependencies() {
     // Ensure AuthController is available (may already be registered from splash)
     if (!Get.isRegistered<AuthController>()) {
-      AuthBinding().dependencies();
+      Get.put<AuthController>(AuthController(), permanent: true);
     }
     Get.lazyPut<HomeController>(() => HomeController());
     Get.lazyPut<EventsController>(() => EventsController());
