@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -14,14 +13,8 @@ class ApiService {
     if (_customBaseUrl != null && _customBaseUrl!.isNotEmpty) {
       return _customBaseUrl!;
     }
-    if (kIsWeb) {
-      return 'http://127.0.0.1:5000/api';
-    }
-    if (Platform.isAndroid) {
-      // 10.0.2.2 points to host localhost in Android Emulator
-      return 'http://10.0.2.2:5000/api';
-    }
-    return 'http://127.0.0.1:5000/api';
+    // Live Render backend
+    return 'https://circle-backend-e52p.onrender.com/api';
   }
 
   static String get hostBaseUrl {
