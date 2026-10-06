@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/theme/app_theme.dart';
-import '../../../core/services/api_service.dart';
 import '../controllers/auth_controller.dart';
 
 class LoginView extends StatefulWidget {
@@ -40,88 +39,18 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  void _showServerSettingsDialog() {
-    final controller = TextEditingController(text: ApiService.baseUrl);
-    Get.dialog(
-      AlertDialog(
-        backgroundColor: AppColors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Backend API URL',
-          style: TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Default: http://10.0.2.2:5000/api (Emulator)\nor http://127.0.0.1:5000/api (Web/PC)',
-              style: TextStyle(fontSize: 12, color: AppColors.gray),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                labelText: 'Base URL',
-                filled: true,
-                fillColor: AppColors.background,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.grayFade(0.2)),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancel', style: TextStyle(color: AppColors.gray)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.card,
-              foregroundColor: AppColors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            onPressed: () {
-              ApiService.setBaseUrl(controller.text.trim());
-              Get.back();
-              Get.snackbar(
-                'Settings Saved',
-                'Backend URL updated to ${controller.text.trim()}',
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: AppColors.card,
-                colorText: AppColors.white,
-                margin: const EdgeInsets.all(16),
-              );
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        actions: [
-          IconButton(
-            tooltip: 'Server Settings',
-            icon: const Icon(Icons.settings_outlined, color: AppColors.text),
-            onPressed: _showServerSettingsDialog,
-          ),
-        ],
-      ),
+      appBar: AppBar(backgroundColor: AppColors.background, elevation: 0),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 28.0,
+              vertical: 16.0,
+            ),
             child: Form(
               key: _formKey,
               child: Column(
@@ -162,15 +91,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'AKGEC Student ERP Login',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.gray,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+
                   const SizedBox(height: 36),
                   TextFormField(
                     controller: _identifierController,
@@ -180,24 +101,39 @@ class _LoginViewState extends State<LoginView> {
                       labelText: 'Student No. or College Email',
                       hintText: 'e.g. 2100320130001 or student@akgec.ac.in',
                       labelStyle: const TextStyle(color: AppColors.gray),
-                      prefixIcon: const Icon(Icons.account_circle_outlined, color: AppColors.gray),
+                      prefixIcon: const Icon(
+                        Icons.account_circle_outlined,
+                        color: AppColors.gray,
+                      ),
                       filled: true,
                       fillColor: AppColors.white,
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(color: AppColors.grayFade(0.2), width: 1.2),
+                        borderSide: BorderSide(
+                          color: AppColors.grayFade(0.2),
+                          width: 1.2,
+                        ),
                       ),
                       focusedBorder: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(14)),
-                        borderSide: BorderSide(color: AppColors.purple, width: 2),
+                        borderSide: BorderSide(
+                          color: AppColors.purple,
+                          width: 2,
+                        ),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: AppColors.pink, width: 1.5),
+                        borderSide: const BorderSide(
+                          color: AppColors.pink,
+                          width: 1.5,
+                        ),
                       ),
                       focusedErrorBorder: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(14)),
-                        borderSide: BorderSide(color: AppColors.magenta, width: 2),
+                        borderSide: BorderSide(
+                          color: AppColors.magenta,
+                          width: 2,
+                        ),
                       ),
                     ),
                     validator: (val) {
@@ -212,12 +148,18 @@ class _LoginViewState extends State<LoginView> {
                     () => TextFormField(
                       controller: _passwordController,
                       obscureText: _obscurePassword.value,
-                      style: const TextStyle(color: AppColors.text, fontSize: 14),
+                      style: const TextStyle(
+                        color: AppColors.text,
+                        fontSize: 14,
+                      ),
                       decoration: InputDecoration(
                         labelText: 'ERP Password',
                         hintText: 'Enter your AKGEC ERP password',
                         labelStyle: const TextStyle(color: AppColors.gray),
-                        prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.gray),
+                        prefixIcon: const Icon(
+                          Icons.lock_outline_rounded,
+                          color: AppColors.gray,
+                        ),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscurePassword.value
@@ -231,19 +173,31 @@ class _LoginViewState extends State<LoginView> {
                         fillColor: AppColors.white,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(color: AppColors.grayFade(0.2), width: 1.2),
+                          borderSide: BorderSide(
+                            color: AppColors.grayFade(0.2),
+                            width: 1.2,
+                          ),
                         ),
                         focusedBorder: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(14)),
-                          borderSide: BorderSide(color: AppColors.purple, width: 2),
+                          borderSide: BorderSide(
+                            color: AppColors.purple,
+                            width: 2,
+                          ),
                         ),
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(color: AppColors.pink, width: 1.5),
+                          borderSide: const BorderSide(
+                            color: AppColors.pink,
+                            width: 1.5,
+                          ),
                         ),
                         focusedErrorBorder: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(14)),
-                          borderSide: BorderSide(color: AppColors.magenta, width: 2),
+                          borderSide: BorderSide(
+                            color: AppColors.magenta,
+                            width: 2,
+                          ),
                         ),
                       ),
                       validator: (val) {
@@ -276,7 +230,9 @@ class _LoginViewState extends State<LoginView> {
                                 height: 22,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2.5,
-                                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.purple),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.purple,
+                                  ),
                                 ),
                               )
                             : const Text(
@@ -291,21 +247,7 @@ class _LoginViewState extends State<LoginView> {
                     );
                   }),
                   const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.verified_user_outlined, size: 16, color: AppColors.grayFade(0.7)),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Direct AKGEC Student ERP Authentication',
-                        style: TextStyle(
-                          color: AppColors.grayFade(0.8),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
+                  Row(mainAxisAlignment: MainAxisAlignment.center),
                 ],
               ),
             ),
