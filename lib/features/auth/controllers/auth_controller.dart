@@ -132,14 +132,11 @@ class AuthController extends GetxController {
       await _persistSession(token, currentUser.value!);
       isLoading.value = false;
 
-      Get.offAllNamed(Routes.HOME);
-      Get.snackbar(
-        'Welcome Back',
-        'Signed in as ${currentUser.value?.name ?? "Student"}',
-        backgroundColor: AppColors.card,
-        colorText: AppColors.white,
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(16),
+      // Prompt "Are you a Society Member?" right after login
+      showSocietyMemberPrompt(
+        onDone: () {
+          Get.offAllNamed(Routes.HOME);
+        },
       );
       return true;
     } catch (e) {
@@ -156,6 +153,177 @@ class AuthController extends GetxController {
       return false;
     }
   }
+
+  Future<bool> updateSocietyStatus(bool isMember) async {
+    try {
+      final token = currentUser.value?.token;
+      if (token != null && token.isNotEmpty) {
+        final response = await ApiService.put(
+          '/auth/society-status',
+          {'isSocietyMember': isMember},
+          token: token,
+        );
+
+        if (response['user'] != null && currentUser.value != null) {
+          final updatedUser = UserModel.fromJson(
+            response['user'] as Map<String, dynamic>,
+            token: token,
+          );
+          currentUser.value = updatedUser;
+          await _persistSession(token, updatedUser);
+          return true;
+        }
+      }
+
+      if (currentUser.value != null) {
+        final updated = currentUser.value!.copyWith(isSocietyMember: isMember);
+        currentUser.value = updated;
+        if (updated.token != null) {
+          await _persistSession(updated.token!, updated);
+        }
+      }
+      return true;
+    } catch (e) {
+      // Local fallback
+      if (currentUser.value != null) {
+        final updated = currentUser.value!.copyWith(isSocietyMember: isMember);
+        currentUser.value = updated;
+        if (updated.token != null) {
+          await _persistSession(updated.token!, updated);
+        }
+      }
+      return false;
+    }
+  }
+
+  void showSocietyMemberPrompt({VoidCallback? onDone}) {
+    Get.dialog(
+      PopScope(
+        canPop: false,
+        child: Dialog(
+          backgroundColor: AppColors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          child: Padding(
+            padding: const EdgeInsets.all(22.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 58,
+                  height: 58,
+                  decoration: const BoxDecoration(
+                    color: AppColors.purpleLight,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.groups_rounded,
+                    color: AppColors.card,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Are you a Society Member?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.text,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Are you an active coordinator, core team member, or lead of any college society/club in AKGEC?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.gray,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 22),
+                // Option 1: Yes, I am a Society Member
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.card,
+                      foregroundColor: AppColors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      elevation: 0,
+                    ),
+                    icon: const Icon(Icons.verified_rounded, size: 20, color: AppColors.purple),
+                    label: const Text(
+                      "Yes, I'm a Society Member",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                    onPressed: () async {
+                      Get.back();
+                      await updateSocietyStatus(true);
+                      if (onDone != null) {
+                        onDone();
+                      }
+                      Get.snackbar(
+                        'Member Access Enabled ★',
+                        'You can now create and manage societies with full member privileges.',
+                        backgroundColor: AppColors.card,
+                        colorText: AppColors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                        margin: const EdgeInsets.all(16),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Option 2: No, Regular Student
+                SizedBox(
+                  width: double.infinity,
+                  height: 46,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.text,
+                      side: BorderSide(color: AppColors.grayFade(0.2)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: () async {
+                      Get.back();
+                      await updateSocietyStatus(false);
+                      if (onDone != null) {
+                        onDone();
+                      }
+                      Get.snackbar(
+                        'Welcome to Circle',
+                        'Signed in as ${currentUser.value?.name ?? "Student"}',
+                        backgroundColor: AppColors.card,
+                        colorText: AppColors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                        margin: const EdgeInsets.all(16),
+                      );
+                    },
+                    child: const Text(
+                      'No, Regular Student',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: AppColors.gray,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+    );
+  }
+
 
   Future<void> logout({bool prompt = true}) async {
     currentUser.value = null;

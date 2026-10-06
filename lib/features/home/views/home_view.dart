@@ -221,6 +221,11 @@ class HomeView extends GetView<HomeController> {
                         buildInfoTile(Icons.menu_book_outlined, 'Course & Branch', '${user?.course ?? ""} ${user?.branch != null ? "• ${user!.branch!}" : ""}'.trim()),
                         buildInfoTile(Icons.grid_view_rounded, 'Current Semester', user?.semester),
                         buildInfoTile(Icons.mail_outline_rounded, 'AKGEC College Email', user?.email),
+                        buildInfoTile(
+                          Icons.groups_outlined,
+                          'Campus Society Role',
+                          user?.isSocietyMember == true ? '★ Verified Society Member' : 'Regular Student',
+                        ),
                       ],
                     ),
 
@@ -236,18 +241,35 @@ class HomeView extends GetView<HomeController> {
                       ],
                     ),
 
-                    // Section 3: Family & Academic History
-                    buildSectionCard(
-                      'PARENTS & QUALIFICATIONS',
-                      Icons.family_restroom_outlined,
-                      [
-                        buildInfoTile(Icons.person_pin_outlined, "Father's Name", user?.fatherName),
-                        buildInfoTile(Icons.person_pin_outlined, "Mother's Name", user?.motherName),
-                        buildInfoTile(Icons.grade_outlined, 'JEE Rank', user?.jeeRank?.toString()),
-                        buildInfoTile(Icons.percent_rounded, '12th / Intermediate %', user?.intermediatePercentage),
-                        buildInfoTile(Icons.percent_rounded, '10th / High School %', user?.highSchoolPercentage),
-                      ],
+                    // Society Role Switch Button
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 20),
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.card,
+                          side: BorderSide(color: AppColors.grayFade(0.2)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        icon: Icon(
+                          user?.isSocietyMember == true ? Icons.verified_rounded : Icons.groups_outlined,
+                          size: 18,
+                          color: user?.isSocietyMember == true ? AppColors.green : AppColors.card,
+                        ),
+                        label: Text(
+                          user?.isSocietyMember == true
+                              ? 'Change Role (Currently Society Member)'
+                              : 'Become a Society Member / Coordinator',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        onPressed: () {
+                          Get.back();
+                          controller.authController.showSocietyMemberPrompt();
+                        },
+                      ),
                     ),
+
 
                     // Admin Shortcut
                     if (isAdmin) ...[
