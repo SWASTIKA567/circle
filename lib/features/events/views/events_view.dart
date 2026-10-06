@@ -730,7 +730,7 @@ class EventsView extends GetView<EventsController> {
                                       size: 16,
                                     ),
                                     label: const Text(
-                                      'Register',
+                                      'Register Now',
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
@@ -993,10 +993,16 @@ class EventsView extends GetView<EventsController> {
 
   static Future<void> _launchUrl(String url) async {
     if (url.trim().isEmpty) return;
+    var formatted = url.trim();
+    if (!formatted.startsWith('http://') && !formatted.startsWith('https://')) {
+      formatted = 'https://$formatted';
+    }
     try {
-      final uri = Uri.parse(url.trim());
+      final uri = Uri.parse(formatted);
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        await launchUrl(uri);
       }
     } catch (_) {}
   }

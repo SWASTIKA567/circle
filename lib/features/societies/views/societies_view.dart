@@ -817,53 +817,94 @@ class SocietiesView extends GetView<SocietiesController> {
                 const SizedBox(height: 8),
                 ...soc.upcomingEvents.map((evt) {
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
-                      color: AppColors.purpleLight,
-                      borderRadius: BorderRadius.circular(12),
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: AppColors.purple.withValues(alpha: 0.3)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.black.withValues(alpha: 0.03),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              evt.title,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.card,
-                              ),
-                            ),
-                            if (evt.date.isNotEmpty)
-                              Text(
-                                evt.date,
-                                style: const TextStyle(fontSize: 11, color: AppColors.gray),
-                              ),
-                          ],
-                        ),
-                        if (evt.description.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(evt.description, style: const TextStyle(fontSize: 12, color: AppColors.text)),
-                        ],
-                        if (evt.registrationLink.isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton.icon(
-                              style: TextButton.styleFrom(
-                                foregroundColor: AppColors.card,
-                                padding: EdgeInsets.zero,
-                              ),
-                              icon: const Icon(Icons.open_in_new_rounded, size: 14),
-                              label: const Text('Register for Event', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                              onPressed: () => controller.launchExternalUrl(evt.registrationLink),
+                        if (evt.imageUrl.trim().isNotEmpty)
+                          ClipRRect(
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                            child: Image.network(
+                              evt.imageUrl.trim(),
+                              height: 140,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) => const SizedBox.shrink(),
                             ),
                           ),
-                        ],
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      evt.title,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.card,
+                                      ),
+                                    ),
+                                  ),
+                                  if (evt.date.isNotEmpty)
+                                    Text(
+                                      evt.date,
+                                      style: const TextStyle(fontSize: 11, color: AppColors.gray),
+                                    ),
+                                ],
+                              ),
+                              if (evt.description.isNotEmpty) ...[
+                                const SizedBox(height: 6),
+                                Text(
+                                  evt.description,
+                                  style: const TextStyle(fontSize: 12, color: AppColors.text, height: 1.3),
+                                ),
+                              ],
+                              if (evt.registrationLink.trim().isNotEmpty) ...[
+                                const SizedBox(height: 10),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.card,
+                                      foregroundColor: AppColors.white,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
+                                      ),
+                                    ),
+                                    icon: const Icon(Icons.open_in_new_rounded, size: 14),
+                                    label: const Text(
+                                      'Register Now',
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                    ),
+                                    onPressed: () => controller.launchExternalUrl(evt.registrationLink),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   );
@@ -883,31 +924,51 @@ class SocietiesView extends GetView<SocietiesController> {
                 const SizedBox(height: 8),
                 ...soc.recentEvents.map((evt) {
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade50,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: Colors.grey.shade200),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              evt.title,
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87),
+                        if (evt.imageUrl.trim().isNotEmpty)
+                          ClipRRect(
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                            child: Image.network(
+                              evt.imageUrl.trim(),
+                              height: 130,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) => const SizedBox.shrink(),
                             ),
-                            if (evt.date.isNotEmpty)
-                              Text(evt.date, style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
-                          ],
+                          ),
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      evt.title,
+                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87),
+                                    ),
+                                  ),
+                                  if (evt.date.isNotEmpty)
+                                    Text(evt.date, style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+                                ],
+                              ),
+                              if (evt.description.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Text(evt.description, style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
+                              ],
+                            ],
+                          ),
                         ),
-                        if (evt.description.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(evt.description, style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
-                        ],
                       ],
                     ),
                   );
@@ -1064,12 +1125,16 @@ class SocietiesView extends GetView<SocietiesController> {
     // Initial Upcoming Event
     final upcomingTitleController = TextEditingController();
     final upcomingDateController = TextEditingController();
+    final upcomingTimeController = TextEditingController();
+    final upcomingImageController = TextEditingController();
     final upcomingLinkController = TextEditingController();
     final upcomingDescController = TextEditingController();
 
     // Initial Recent Event
     final recentTitleController = TextEditingController();
     final recentDateController = TextEditingController();
+    final recentTimeController = TextEditingController();
+    final recentImageController = TextEditingController();
     final recentDescController = TextEditingController();
 
     final selectedCategory = 'Technical'.obs;
@@ -1283,9 +1348,25 @@ class SocietiesView extends GetView<SocietiesController> {
                 children: [
                   _buildTextField(controller: upcomingTitleController, label: 'Event Title', hint: 'e.g. Hackathon 2026'),
                   const SizedBox(height: 8),
-                  _buildTextField(controller: upcomingDateController, label: 'Event Date', hint: 'e.g. 25 Oct 2026'),
+                  Row(
+                    children: [
+                      Expanded(child: _buildTextField(controller: upcomingDateController, label: 'Event Date', hint: 'e.g. 25 Oct 2026')),
+                      const SizedBox(width: 8),
+                      Expanded(child: _buildTextField(controller: upcomingTimeController, label: 'Event Time', hint: 'e.g. 10:00 AM')),
+                    ],
+                  ),
                   const SizedBox(height: 8),
-                  _buildTextField(controller: upcomingLinkController, label: 'Registration Link', hint: 'https://...'),
+                  _buildTextField(
+                    controller: upcomingImageController,
+                    label: 'Event Poster / Image URL (optional)',
+                    hint: 'https://... (rectangular banner on home screen)',
+                  ),
+                  const SizedBox(height: 8),
+                  _buildTextField(
+                    controller: upcomingLinkController,
+                    label: 'Registration Link (optional)',
+                    hint: 'https://... (linked with Register Now button)',
+                  ),
                   const SizedBox(height: 8),
                   _buildTextField(controller: upcomingDescController, label: 'Description', hint: 'Brief about the event...'),
                   const SizedBox(height: 10),
@@ -1299,7 +1380,19 @@ class SocietiesView extends GetView<SocietiesController> {
                 children: [
                   _buildTextField(controller: recentTitleController, label: 'Event Title', hint: 'e.g. Annual Tech Summit'),
                   const SizedBox(height: 8),
-                  _buildTextField(controller: recentDateController, label: 'Event Date', hint: 'e.g. 15 Jan 2026'),
+                  Row(
+                    children: [
+                      Expanded(child: _buildTextField(controller: recentDateController, label: 'Event Date', hint: 'e.g. 15 Jan 2026')),
+                      const SizedBox(width: 8),
+                      Expanded(child: _buildTextField(controller: recentTimeController, label: 'Event Time', hint: 'e.g. 02:00 PM')),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  _buildTextField(
+                    controller: recentImageController,
+                    label: 'Event Poster / Image URL (optional)',
+                    hint: 'https://...',
+                  ),
                   const SizedBox(height: 8),
                   _buildTextField(controller: recentDescController, label: 'Summary', hint: 'Brief summary of achievements...'),
                   const SizedBox(height: 10),
@@ -1350,6 +1443,8 @@ class SocietiesView extends GetView<SocietiesController> {
                             upcoming.add(SocietyEventModel(
                               title: upcomingTitleController.text.trim(),
                               date: upcomingDateController.text.trim(),
+                              time: upcomingTimeController.text.trim(),
+                              imageUrl: upcomingImageController.text.trim(),
                               registrationLink: upcomingLinkController.text.trim(),
                               description: upcomingDescController.text.trim(),
                             ));
@@ -1360,6 +1455,8 @@ class SocietiesView extends GetView<SocietiesController> {
                             recent.add(SocietyEventModel(
                               title: recentTitleController.text.trim(),
                               date: recentDateController.text.trim(),
+                              time: recentTimeController.text.trim(),
+                              imageUrl: recentImageController.text.trim(),
                               description: recentDescController.text.trim(),
                             ));
                           }
