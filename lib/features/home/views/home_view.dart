@@ -16,149 +16,303 @@ class HomeView extends GetView<HomeController> {
     final isSocietyMember = user?.isSocietyMember ?? false;
     final isAdmin = user?.isAdmin == true || user?.role == 'admin';
 
+    Widget buildInfoTile(IconData icon, String title, String? value) {
+      if (value == null || value.trim().isEmpty) return const SizedBox.shrink();
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: 18, color: AppColors.card),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(fontSize: 11, color: AppColors.gray, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.text),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    Widget buildSectionCard(String title, IconData sectionIcon, List<Widget> children) {
+      final validChildren = children.where((w) => w is! SizedBox).toList();
+      if (validChildren.isEmpty) return const SizedBox.shrink();
+
+      return Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.grayFade(0.12)),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withValues(alpha: 0.02),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(sectionIcon, size: 16, color: AppColors.purple),
+                const SizedBox(width: 6),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.text,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            ...validChildren,
+          ],
+        ),
+      );
+    }
+
     Get.bottomSheet(
       SafeArea(
         child: Container(
-          decoration: const BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.88,
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          decoration: const BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
+              const SizedBox(height: 12),
               Container(
-                width: 40,
+                width: 44,
                 height: 4,
                 decoration: BoxDecoration(
                   color: AppColors.grayFade(0.3),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
-              const SizedBox(height: 18),
-              CircleAvatar(
-                radius: 36,
-                backgroundColor: isAdmin ? AppColors.card : AppColors.purpleLight,
-                child: Text(
-                  controller.getInitials(user?.name ?? 'User'),
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: isAdmin ? AppColors.purple : AppColors.card,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                user?.name ?? 'Circle User',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.text),
-              ),
-              const SizedBox(height: 2),
-              Text(user?.email ?? '', style: const TextStyle(fontSize: 13, color: AppColors.gray)),
-              const SizedBox(height: 14),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isAdmin
-                      ? AppColors.card
-                      : isSocietyMember
-                          ? AppColors.purpleLight
-                          : AppColors.blueLight,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  isAdmin
-                      ? '⭐ System Administrator'
-                      : isSocietyMember
-                          ? '★ Verified Society Member'
-                          : 'General Student',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isAdmin
-                        ? AppColors.green
-                        : isSocietyMember
-                            ? AppColors.card
-                            : AppColors.text,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              Divider(color: AppColors.grayFade(0.15)),
-              ListTile(
-                leading: const Icon(Icons.badge_outlined, color: AppColors.card),
-                title: const Text('Student / Admin ID', style: TextStyle(fontSize: 12, color: AppColors.gray)),
-                subtitle: Text(
-                  user?.studentNo.isNotEmpty == true ? user!.studentNo : 'N/A',
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.text),
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.shield_outlined, color: AppColors.card),
-                title: const Text('Account Role', style: TextStyle(fontSize: 12, color: AppColors.gray)),
-                subtitle: Text(
-                  isAdmin ? 'Administrator (Full Review & Manage Rights)' : 'Student User',
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.text),
-                ),
-              ),
-              if (isAdmin) ...[
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.card,
-                      foregroundColor: AppColors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      elevation: 0,
-                    ),
-                    icon: const Icon(Icons.admin_panel_settings_rounded, size: 20, color: AppColors.purple),
-                    label: const Text('Open Admin Panel', style: TextStyle(fontWeight: FontWeight.bold)),
-                    onPressed: () {
-                      Get.back();
-                      Get.toNamed(Routes.ADMIN);
-                    },
-                  ),
-                ),
-              ],
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.pink,
-                    side: BorderSide(color: AppColors.pink.withValues(alpha: 0.6)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  icon: const Icon(Icons.logout_rounded, size: 20, color: AppColors.pink),
-                  label: const Text('Sign Out', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.text)),
-                  onPressed: () {
-                    Get.back();
-                    Get.dialog(
-                      AlertDialog(
-                        backgroundColor: AppColors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                        title: const Text('Sign Out', style: TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
-                        content: const Text('Are you sure you want to sign out of Circle?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Get.back(),
-                            child: const Text('Cancel', style: TextStyle(color: AppColors.gray)),
+              const SizedBox(height: 16),
+
+              // Scrollable Profile Content
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  children: [
+                    // Header Avatar & Identity
+                    Center(
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: AppColors.purple.withValues(alpha: 0.4), width: 2),
+                            ),
+                            child: CircleAvatar(
+                              radius: 38,
+                              backgroundColor: isAdmin ? AppColors.card : AppColors.purpleLight,
+                              child: Text(
+                                controller.getInitials(user?.name ?? 'User'),
+                                style: TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold,
+                                  color: isAdmin ? AppColors.purple : AppColors.card,
+                                ),
+                              ),
+                            ),
                           ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.card, foregroundColor: AppColors.white),
-                            onPressed: () {
-                              Get.back();
-                              controller.authController.logout();
-                            },
-                            child: const Text('Sign Out'),
+                          const SizedBox(height: 12),
+                          Text(
+                            user?.name ?? 'Circle User',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.text),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            user?.email ?? '',
+                            style: const TextStyle(fontSize: 13, color: AppColors.gray, fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            alignment: WrapAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: isAdmin
+                                      ? AppColors.card
+                                      : isSocietyMember
+                                          ? AppColors.purpleLight
+                                          : AppColors.blueLight,
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: Text(
+                                  isAdmin
+                                      ? '⭐ Administrator'
+                                      : isSocietyMember
+                                          ? '★ Society Member'
+                                          : 'Verified Student',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: isAdmin
+                                        ? AppColors.green
+                                        : isSocietyMember
+                                            ? AppColors.card
+                                            : AppColors.text,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              if (user?.branch != null && user!.branch!.isNotEmpty)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.white,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: AppColors.grayFade(0.2)),
+                                  ),
+                                  child: Text(
+                                    user.branch!,
+                                    style: const TextStyle(fontSize: 11, color: AppColors.text, fontWeight: FontWeight.w700),
+                                  ),
+                                ),
+                            ],
                           ),
                         ],
                       ),
-                    );
-                  },
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Section 1: Academic & College ERP
+                    buildSectionCard(
+                      'ACADEMIC PROFILE',
+                      Icons.school_outlined,
+                      [
+                        buildInfoTile(Icons.badge_outlined, 'Student / Admission No.', user?.admissionNo ?? user?.studentNo),
+                        buildInfoTile(Icons.menu_book_outlined, 'Course & Branch', '${user?.course ?? ""} ${user?.branch != null ? "• ${user!.branch!}" : ""}'.trim()),
+                        buildInfoTile(Icons.grid_view_rounded, 'Current Semester', user?.semester),
+                        buildInfoTile(Icons.mail_outline_rounded, 'AKGEC College Email', user?.email),
+                      ],
+                    ),
+
+                    // Section 2: Personal Details
+                    buildSectionCard(
+                      'PERSONAL DETAILS',
+                      Icons.person_outline_rounded,
+                      [
+                        buildInfoTile(Icons.phone_outlined, 'Mobile Number', user?.mobileNo),
+                        buildInfoTile(Icons.cake_outlined, 'Date of Birth', user?.dob),
+                        buildInfoTile(Icons.water_drop_outlined, 'Blood Group', user?.bloodGroup),
+                        buildInfoTile(Icons.home_outlined, 'Address', user?.address),
+                      ],
+                    ),
+
+                    // Section 3: Family & Academic History
+                    buildSectionCard(
+                      'PARENTS & QUALIFICATIONS',
+                      Icons.family_restroom_outlined,
+                      [
+                        buildInfoTile(Icons.person_pin_outlined, "Father's Name", user?.fatherName),
+                        buildInfoTile(Icons.person_pin_outlined, "Mother's Name", user?.motherName),
+                        buildInfoTile(Icons.grade_outlined, 'JEE Rank', user?.jeeRank?.toString()),
+                        buildInfoTile(Icons.percent_rounded, '12th / Intermediate %', user?.intermediatePercentage),
+                        buildInfoTile(Icons.percent_rounded, '10th / High School %', user?.highSchoolPercentage),
+                      ],
+                    ),
+
+                    // Admin Shortcut
+                    if (isAdmin) ...[
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.card,
+                            foregroundColor: AppColors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            elevation: 0,
+                          ),
+                          icon: const Icon(Icons.admin_panel_settings_rounded, size: 20, color: AppColors.purple),
+                          label: const Text('Open Admin Panel', style: TextStyle(fontWeight: FontWeight.bold)),
+                          onPressed: () {
+                            Get.back();
+                            Get.toNamed(Routes.ADMIN);
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
+                    // Sign Out Action
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.pink,
+                          side: BorderSide(color: AppColors.pink.withValues(alpha: 0.6)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        icon: const Icon(Icons.logout_rounded, size: 20, color: AppColors.pink),
+                        label: const Text('Sign Out', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.text)),
+                        onPressed: () {
+                          Get.back();
+                          Get.dialog(
+                            AlertDialog(
+                              backgroundColor: AppColors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              title: const Text('Sign Out', style: TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+                              content: const Text('Are you sure you want to sign out of Circle?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Get.back(),
+                                  child: const Text('Cancel', style: TextStyle(color: AppColors.gray)),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.card, foregroundColor: AppColors.white),
+                                  onPressed: () {
+                                    Get.back();
+                                    controller.authController.logout();
+                                  },
+                                  child: const Text('Sign Out'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
                 ),
               ),
             ],
