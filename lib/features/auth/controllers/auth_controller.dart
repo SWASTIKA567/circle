@@ -22,15 +22,30 @@ class AuthController extends GetxController {
       isLoading.value = true;
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString(_tokenKey);
+      final cachedUserStr = prefs.getString(_userKey);
 
       if (token == null || token.isEmpty) {
         isLoading.value = false;
         return false;
       }
 
+      // 1. Instantly restore cached user session if available
+      if (cachedUserStr != null && cachedUserStr.isNotEmpty) {
+        try {
+          final userData = jsonDecode(cachedUserStr) as Map<String, dynamic>;
+          currentUser.value = UserModel.fromJson(userData, token: token);
+          isLoading.value = false;
+
+          // Asynchronously verify/refresh profile in background (never blocks app launch)
+          _verifySessionInBackground(token);
+          return true;
+        } catch (_) {}
+      }
+
+      // 2. If token exists but no cached user string, try /auth/me with safe timeout
       try {
         final response = await ApiService.get('/auth/me', token: token)
-            .timeout(const Duration(seconds: 3));
+            .timeout(const Duration(seconds: 5));
         if (response['success'] == true && response['user'] != null) {
           currentUser.value = UserModel.fromJson(response['user'], token: token);
           await _persistSession(token, currentUser.value!);
@@ -38,27 +53,36 @@ class AuthController extends GetxController {
           return true;
         }
       } catch (e) {
-        final cachedUserStr = prefs.getString(_userKey);
-        if (cachedUserStr != null) {
-          try {
-            final userData = jsonDecode(cachedUserStr) as Map<String, dynamic>;
-            currentUser.value = UserModel.fromJson(userData, token: token);
-            isLoading.value = false;
-            return true;
-          } catch (_) {}
+        // Only clear if server explicitly rejected the token as unauthorized
+        if (e.toString().contains('401') || e.toString().contains('Unauthorized') || e.toString().contains('jwt expired')) {
+          await prefs.remove(_tokenKey);
+          await prefs.remove(_userKey);
+          currentUser.value = null;
         }
       }
 
-      // If token is invalid or server failed, clean up cached session silently
-      await prefs.remove(_tokenKey);
-      await prefs.remove(_userKey);
-      currentUser.value = null;
       isLoading.value = false;
-      return false;
+      return currentUser.value != null;
     } catch (_) {
       isLoading.value = false;
       return false;
     }
+  }
+
+  void _verifySessionInBackground(String token) {
+    ApiService.get('/auth/me', token: token).then((response) async {
+      if (response['success'] == true && response['user'] != null) {
+        final updatedUser = UserModel.fromJson(response['user'], token: token);
+        currentUser.value = updatedUser;
+        await _persistSession(token, updatedUser);
+      }
+    }).catchError((e) async {
+      // If server explicitly returns 401 Unauthorized, token has expired
+      if (e.toString().contains('401') || e.toString().contains('jwt expired')) {
+        await logout(prompt: false);
+      }
+      // Any other error (e.g. offline, timeout, Render cold boot) is safely ignored!
+    });
   }
 
   Future<bool> register({

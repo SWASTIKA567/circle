@@ -430,4 +430,42 @@ class SocietiesController extends GetxController {
       );
     }
   }
+
+  Future<bool> deleteSociety(String societyId) async {
+    try {
+      final token = _getUserToken();
+      if (token == null) throw Exception('Admin authentication token required.');
+
+      final response = await ApiService.delete(
+        '/admin/societies/$societyId/reject',
+        token: token,
+      );
+
+      if (response['success'] == true) {
+        societies.removeWhere((s) => s.id == societyId);
+        unlockedSocieties.remove(societyId);
+
+        Get.snackbar(
+          'Society Deleted 🗑️',
+          response['message'] ?? 'Society was permanently removed.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.card,
+          colorText: AppColors.white,
+          margin: const EdgeInsets.all(16),
+        );
+        return true;
+      }
+      return false;
+    } catch (e) {
+      Get.snackbar(
+        'Delete Failed',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
+        margin: const EdgeInsets.all(16),
+      );
+      return false;
+    }
+  }
 }

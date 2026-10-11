@@ -629,6 +629,62 @@ class SocietiesView extends GetView<SocietiesController> {
                     );
                   }),
                 ),
+
+                // Admin Delete Society Option
+                Obx(() {
+                  final user = authController.currentUser.value;
+                  final isAdmin = user?.isAdmin == true || user?.role == 'admin';
+                  if (!isAdmin) return const SizedBox.shrink();
+
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 6),
+                    child: IconButton(
+                      style: IconButton.styleFrom(
+                        foregroundColor: AppColors.magenta,
+                        backgroundColor: AppColors.pinkLight,
+                        padding: const EdgeInsets.all(7),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      icon: const Icon(Icons.delete_outline_rounded, size: 17),
+                      tooltip: 'Delete Society (Admin)',
+                      onPressed: () {
+                        Get.dialog(
+                          AlertDialog(
+                            backgroundColor: AppColors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                            title: const Row(
+                              children: [
+                                Icon(Icons.delete_forever_rounded, color: AppColors.magenta),
+                                SizedBox(width: 8),
+                                Text('Delete Society', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.text)),
+                              ],
+                            ),
+                            content: Text('Are you sure you want to permanently delete "${soc.name}"? This cannot be undone.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Get.back(),
+                                child: const Text('Cancel', style: TextStyle(color: AppColors.gray)),
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.magenta,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
+                                onPressed: () {
+                                  Get.back();
+                                  controller.deleteSociety(soc.id);
+                                },
+                                child: const Text('Delete'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }),
               ],
             ),
           ],
@@ -1001,6 +1057,68 @@ class SocietiesView extends GetView<SocietiesController> {
                     },
                   );
                 }),
+              ),
+
+              // Admin Delete Option
+              Builder(
+                builder: (context) {
+                  final authCtrl = Get.isRegistered<AuthController>() ? Get.find<AuthController>() : null;
+                  final user = authCtrl?.currentUser.value;
+                  final isAdmin = user?.isAdmin == true || user?.role == 'admin';
+                  if (!isAdmin) return const SizedBox.shrink();
+
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.magenta,
+                          side: const BorderSide(color: AppColors.magenta),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        icon: const Icon(Icons.delete_forever_rounded, size: 18),
+                        label: const Text('Delete Society (Admin)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                        onPressed: () {
+                          Get.dialog(
+                            AlertDialog(
+                              backgroundColor: AppColors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                              title: const Row(
+                                children: [
+                                  Icon(Icons.delete_forever_rounded, color: AppColors.magenta),
+                                  SizedBox(width: 8),
+                                  Text('Delete Society', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.text)),
+                                ],
+                              ),
+                              content: Text('Are you sure you want to permanently delete "${soc.name}"? This cannot be undone.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Get.back(),
+                                  child: const Text('Cancel', style: TextStyle(color: AppColors.gray)),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.magenta,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                  onPressed: () {
+                                    Get.back(); // close dialog
+                                    Get.back(); // close details modal
+                                    controller.deleteSociety(soc.id);
+                                  },
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),

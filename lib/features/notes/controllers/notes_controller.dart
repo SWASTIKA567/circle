@@ -264,4 +264,39 @@ class NotesController extends GetxController {
       );
     }
   }
+
+  Future<bool> deleteNote(String noteId) async {
+    try {
+      String? token;
+      if (Get.isRegistered<AuthController>()) {
+        token = Get.find<AuthController>().currentUser.value?.token;
+      }
+
+      final response = await ApiService.delete('/notes/$noteId', token: token);
+
+      if (response['success'] == true) {
+        notes.removeWhere((n) => n.id == noteId);
+        Get.snackbar(
+          'Note Deleted 🗑️',
+          response['message'] ?? 'Note was permanently removed.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.card,
+          colorText: AppColors.white,
+          margin: const EdgeInsets.all(16),
+        );
+        return true;
+      }
+      return false;
+    } catch (e) {
+      Get.snackbar(
+        'Delete Failed',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
+        margin: const EdgeInsets.all(16),
+      );
+      return false;
+    }
+  }
 }

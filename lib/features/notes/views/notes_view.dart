@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import '../../../app/theme/app_theme.dart';
 import '../controllers/notes_controller.dart';
 import '../models/note_model.dart';
+import '../../auth/controllers/auth_controller.dart';
 
 class NotesView extends GetView<NotesController> {
   const NotesView({super.key});
@@ -607,6 +608,63 @@ class NotesView extends GetView<NotesController> {
                   icon: const Icon(Icons.download_rounded, size: 15),
                   label: const Text('Download', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                   onPressed: () => controller.downloadNotePdf(note),
+                ),
+                Builder(
+                  builder: (context) {
+                    final authCtrl = Get.isRegistered<AuthController>() ? Get.find<AuthController>() : null;
+                    final currentUser = authCtrl?.currentUser.value;
+                    final isAdmin = currentUser?.isAdmin == true || currentUser?.role == 'admin';
+                    if (!isAdmin) return const SizedBox.shrink();
+
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 6),
+                      child: IconButton(
+                        style: IconButton.styleFrom(
+                          foregroundColor: AppColors.magenta,
+                          backgroundColor: AppColors.pinkLight,
+                          padding: const EdgeInsets.all(7),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                        icon: const Icon(Icons.delete_outline_rounded, size: 17),
+                        tooltip: 'Delete Note (Admin)',
+                        onPressed: () {
+                          Get.dialog(
+                            AlertDialog(
+                              backgroundColor: AppColors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                              title: const Row(
+                                children: [
+                                  Icon(Icons.delete_forever_rounded, color: AppColors.magenta),
+                                  SizedBox(width: 8),
+                                  Text('Delete Note', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.text)),
+                                ],
+                              ),
+                              content: Text('Are you sure you want to permanently delete "${note.title}"? This will also remove the PDF file from the server.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Get.back(),
+                                  child: const Text('Cancel', style: TextStyle(color: AppColors.gray)),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.magenta,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                  onPressed: () {
+                                    Get.back();
+                                    controller.deleteNote(note.id);
+                                  },
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

@@ -20,12 +20,10 @@ class SplashController extends GetxController {
 
       final authController = Get.find<AuthController>();
 
-      // Safe timeout for auto-login so splash NEVER hangs
-      final isLoggedIn = await authController
-          .tryAutoLogin()
-          .timeout(const Duration(seconds: 3), onTimeout: () => false);
+      // Restore session instantly from local storage
+      final isLoggedIn = await authController.tryAutoLogin();
 
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 400));
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (isLoggedIn) {
