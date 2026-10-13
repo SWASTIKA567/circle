@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../app/theme/app_theme.dart';
 import '../../../core/services/api_service.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../models/attendance_model.dart';
@@ -120,6 +121,52 @@ class AttendanceController extends GetxController {
     } finally {
       isLoading.value = false;
       isRefreshing.value = false;
+    }
+  }
+
+  Future<bool> linkCredentials(String password) async {
+    final token = _token;
+    if (token == null || token.isEmpty) return false;
+
+    isLoading.value = true;
+    errorMessage.value = '';
+
+    try {
+      final response = await ApiService.post('/attendance/link', {
+        'password': password,
+      }, token: token);
+
+      if (response['success'] == true && response['attendance'] != null) {
+        final data = AttendanceDataModel.fromJson(
+          response['attendance'] as Map<String, dynamic>,
+          isFromCache: false,
+        );
+        attendance.value = data;
+        await _saveCachedAttendance(data);
+        isLoading.value = false;
+        Get.snackbar(
+          'ERP Synced',
+          'Attendance loaded successfully!',
+          backgroundColor: AppColors.greenLight,
+          colorText: AppColors.green,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return true;
+      } else {
+        throw Exception(response['message'] ?? 'Failed to sync with ERP.');
+      }
+    } catch (e) {
+      isLoading.value = false;
+      final cleanMsg = e.toString().replaceAll('Exception: ', '');
+      errorMessage.value = cleanMsg;
+      Get.snackbar(
+        'ERP Sync Failed',
+        cleanMsg,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
     }
   }
 }

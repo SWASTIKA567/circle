@@ -153,6 +153,13 @@ class AuthController extends GetxController {
       final userMap = response['user'] as Map<String, dynamic>;
       currentUser.value = UserModel.fromJson(userMap, token: token);
 
+      if (response['attendance'] != null) {
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('cached_student_attendance', jsonEncode(response['attendance']));
+        } catch (_) {}
+      }
+
       await _persistSession(token, currentUser.value!);
       isLoading.value = false;
 
