@@ -349,6 +349,14 @@ class AuthController extends GetxController {
   }
 
 
+  Future<void> updateCurrentUser(UserModel user) async {
+    currentUser.value = user;
+    final token = user.token ?? currentUser.value?.token;
+    if (token != null && token.isNotEmpty) {
+      await _persistSession(token, user);
+    }
+  }
+
   Future<void> logout({bool prompt = true}) async {
     currentUser.value = null;
     try {

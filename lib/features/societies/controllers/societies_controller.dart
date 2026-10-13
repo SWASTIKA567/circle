@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -208,6 +209,34 @@ class SocietiesController extends GetxController {
     }
   }
 
+  Future<String?> uploadSocietyLogo(File imageFile) async {
+    try {
+      final token = _getUserToken();
+      final response = await ApiService.uploadFile(
+        '/societies/upload-logo',
+        file: imageFile,
+        fields: {},
+        fileField: 'logo',
+        token: token,
+      );
+
+      if (response['success'] == true && response['logoUrl'] != null) {
+        return response['logoUrl'].toString();
+      } else {
+        throw Exception(response['message'] ?? 'Failed to upload logo.');
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Logo Upload Failed',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
+      );
+      return null;
+    }
+  }
+
   Future<bool> createSociety({
     required String name,
     required String department,
@@ -249,6 +278,16 @@ class SocietiesController extends GetxController {
         final newSociety = SocietyModel.fromJson(response['society']);
         if (newSociety.isApproved) {
           societies.insert(0, newSociety);
+        }
+
+        // Update local user state to reflect society membership
+        if (Get.isRegistered<AuthController>()) {
+          final auth = Get.find<AuthController>();
+          final current = auth.currentUser.value;
+          if (current != null && !current.isSocietyMember) {
+            final updatedUser = current.copyWith(isSocietyMember: true);
+            auth.updateCurrentUser(updatedUser);
+          }
         }
 
         Get.snackbar(

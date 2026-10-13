@@ -1,7 +1,10 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../app/theme/app_theme.dart';
+import '../../../core/services/api_service.dart';
 import '../controllers/societies_controller.dart';
 import '../models/society_model.dart';
 import '../../auth/controllers/auth_controller.dart';
@@ -373,8 +376,7 @@ class SocietiesView extends GetView<SocietiesController> {
       ),
       floatingActionButton: Obx(() {
         final user = authController.currentUser.value;
-        final isSocietyMember = user?.isSocietyMember ?? false;
-        if (!isSocietyMember) return const SizedBox.shrink();
+        if (user == null) return const SizedBox.shrink();
 
         return FloatingActionButton.extended(
           backgroundColor: AppColors.card,
@@ -389,31 +391,13 @@ class SocietiesView extends GetView<SocietiesController> {
 
   void _handleCreateSocietyPressed(BuildContext context, AuthController authController) {
     final user = authController.currentUser.value;
-    final isSocietyMember = user?.isSocietyMember ?? false;
-
-    if (!isSocietyMember) {
-      Get.dialog(
-        AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-          title: Row(
-            children: [
-              Icon(Icons.shield_outlined, color: AppColors.purple),
-              const SizedBox(width: 8),
-              const Text('Member Only', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          content: const Text(
-            'Only verified society members can create and manage societies.\n\n'
-            'Non-members can explore and view all society details, events, and recruitment links.',
-            style: TextStyle(fontSize: 14, color: Colors.black87, height: 1.4),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Get.back(),
-              child: const Text('Got it', style: TextStyle(color: primaryIndigo, fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
+    if (user == null) {
+      Get.snackbar(
+        'Login Required',
+        'Please sign in to register a society.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
       );
       return;
     }
@@ -454,16 +438,37 @@ class SocietiesView extends GetView<SocietiesController> {
                   decoration: BoxDecoration(
                     color: AppColors.purpleLight,
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.grayFade(0.12)),
                   ),
-                  child: Center(
-                    child: Text(
-                      soc.name.isNotEmpty ? soc.name[0].toUpperCase() : 'S',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.card,
-                      ),
-                    ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: soc.logoUrl.trim().isNotEmpty
+                        ? Image.network(
+                            ApiService.resolveFileUrl(soc.logoUrl.trim()),
+                            width: 46,
+                            height: 46,
+                            fit: BoxFit.cover,
+                            errorBuilder: (ctx, err, stack) => Center(
+                              child: Text(
+                                soc.name.isNotEmpty ? soc.name[0].toUpperCase() : 'S',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.card,
+                                ),
+                              ),
+                            ),
+                          )
+                        : Center(
+                            child: Text(
+                              soc.name.isNotEmpty ? soc.name[0].toUpperCase() : 'S',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.card,
+                              ),
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -731,16 +736,37 @@ class SocietiesView extends GetView<SocietiesController> {
                     decoration: BoxDecoration(
                       color: AppColors.purpleLight,
                       borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.grayFade(0.12)),
                     ),
-                    child: Center(
-                      child: Text(
-                        soc.name.isNotEmpty ? soc.name[0].toUpperCase() : 'S',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.card,
-                        ),
-                      ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: soc.logoUrl.trim().isNotEmpty
+                          ? Image.network(
+                              ApiService.resolveFileUrl(soc.logoUrl.trim()),
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                              errorBuilder: (ctx, err, stack) => Center(
+                                child: Text(
+                                  soc.name.isNotEmpty ? soc.name[0].toUpperCase() : 'S',
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.card,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Center(
+                              child: Text(
+                                soc.name.isNotEmpty ? soc.name[0].toUpperCase() : 'S',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.card,
+                                ),
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -1239,6 +1265,8 @@ class SocietiesView extends GetView<SocietiesController> {
     final registrationController = TextEditingController();
     final domainsController = TextEditingController();
     final logoController = TextEditingController();
+    final Rx<File?> pickedLogoFile = Rx<File?>(null);
+    final RxString pickedLogoFileName = ''.obs;
 
     // Initial Upcoming Event
     final upcomingTitleController = TextEditingController();
@@ -1451,10 +1479,124 @@ class SocietiesView extends GetView<SocietiesController> {
               ),
               const SizedBox(height: 10),
 
-              // Logo URL
+              // Society Logo Image Picker
+              const Text(
+                'Society Logo Image',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.text),
+              ),
+              const SizedBox(height: 2),
+              const Text(
+                'Select a club/society logo to display next to its name.',
+                style: TextStyle(fontSize: 11, color: AppColors.gray),
+              ),
+              const SizedBox(height: 6),
+              Obx(() {
+                final file = pickedLogoFile.value;
+                if (file != null) {
+                  return Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.purpleLight.withValues(alpha: 0.35),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.purple.withValues(alpha: 0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            file,
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                pickedLogoFileName.value.isNotEmpty ? pickedLogoFileName.value : 'Logo selected',
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.text),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              const Text(
+                                'Ready to upload with society',
+                                style: TextStyle(fontSize: 11, color: AppColors.card, fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            try {
+                              final result = await FilePicker.platform.pickFiles(type: FileType.image);
+                              if (result != null && result.files.single.path != null) {
+                                pickedLogoFile.value = File(result.files.single.path!);
+                                pickedLogoFileName.value = result.files.single.name;
+                              }
+                            } catch (e) {
+                              Get.snackbar('Error', 'Failed to pick image: $e');
+                            }
+                          },
+                          child: const Text('Change', style: TextStyle(color: primaryIndigo, fontSize: 12, fontWeight: FontWeight.bold)),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close_rounded, color: AppColors.magenta, size: 20),
+                          tooltip: 'Remove',
+                          onPressed: () {
+                            pickedLogoFile.value = null;
+                            pickedLogoFileName.value = '';
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return InkWell(
+                  onTap: () async {
+                    try {
+                      final result = await FilePicker.platform.pickFiles(type: FileType.image);
+                      if (result != null && result.files.single.path != null) {
+                        pickedLogoFile.value = File(result.files.single.path!);
+                        pickedLogoFileName.value = result.files.single.name;
+                      }
+                    } catch (e) {
+                      Get.snackbar('Error', 'Failed to pick image: $e');
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.grayFade(0.2)),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.image_outlined, color: primaryIndigo, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          'Upload Society Logo Image',
+                          style: TextStyle(color: primaryIndigo, fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+              const SizedBox(height: 8),
+
+              // Optional URL fallback
               _buildTextField(
                 controller: logoController,
-                label: 'Logo URL (optional)',
+                label: 'Or Logo Image URL (optional fallback)',
                 hint: 'https://...',
               ),
               const SizedBox(height: 16),
@@ -1579,6 +1721,15 @@ class SocietiesView extends GetView<SocietiesController> {
                             ));
                           }
 
+                          // If logo image picked, upload it first
+                          String finalLogoUrl = logoController.text.trim();
+                          if (pickedLogoFile.value != null) {
+                            final uploadedLogoUrl = await controller.uploadSocietyLogo(pickedLogoFile.value!);
+                            if (uploadedLogoUrl != null && uploadedLogoUrl.isNotEmpty) {
+                              finalLogoUrl = uploadedLogoUrl;
+                            }
+                          }
+
                           final success = await controller.createSociety(
                             name: nameController.text.trim(),
                             department: deptController.text.trim(),
@@ -1586,7 +1737,7 @@ class SocietiesView extends GetView<SocietiesController> {
                             societyPassword: passwordController.text.trim(),
                             websiteLink: websiteController.text.trim(),
                             registrationLink: registrationController.text.trim(),
-                            logoUrl: logoController.text.trim(),
+                            logoUrl: finalLogoUrl,
                             domains: domainList,
                             upcomingEvents: upcoming,
                             recentEvents: recent,
@@ -1621,6 +1772,9 @@ class SocietiesView extends GetView<SocietiesController> {
     final websiteController = TextEditingController(text: soc.websiteLink);
     final registrationController = TextEditingController(text: soc.registrationLink);
     final domainsController = TextEditingController(text: soc.domains.join(', '));
+    final logoController = TextEditingController(text: soc.logoUrl);
+    final Rx<File?> pickedEditLogoFile = Rx<File?>(null);
+    final RxString pickedEditLogoFileName = ''.obs;
     final newPasswordController = TextEditingController();
 
     // Event additions
@@ -1720,6 +1874,108 @@ class SocietiesView extends GetView<SocietiesController> {
               const SizedBox(height: 10),
 
               _buildTextField(controller: domainsController, label: 'Domains (comma separated)', hint: 'Web, AI, Cloud'),
+              const SizedBox(height: 10),
+
+              // Society Logo
+              const Text(
+                'Society Logo Image',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.text),
+              ),
+              const SizedBox(height: 2),
+              const Text(
+                'Upload an updated club logo image or keep existing.',
+                style: TextStyle(fontSize: 11, color: AppColors.gray),
+              ),
+              const SizedBox(height: 6),
+              Obx(() {
+                final file = pickedEditLogoFile.value;
+                if (file != null) {
+                  return Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.purpleLight.withValues(alpha: 0.35),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.purple.withValues(alpha: 0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            file,
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                pickedEditLogoFileName.value.isNotEmpty ? pickedEditLogoFileName.value : 'New logo selected',
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.text),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              const Text(
+                                'Will be updated upon saving',
+                                style: TextStyle(fontSize: 11, color: AppColors.card, fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close_rounded, color: AppColors.magenta, size: 20),
+                          tooltip: 'Remove',
+                          onPressed: () {
+                            pickedEditLogoFile.value = null;
+                            pickedEditLogoFileName.value = '';
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return InkWell(
+                  onTap: () async {
+                    try {
+                      final result = await FilePicker.platform.pickFiles(type: FileType.image);
+                      if (result != null && result.files.single.path != null) {
+                        pickedEditLogoFile.value = File(result.files.single.path!);
+                        pickedEditLogoFileName.value = result.files.single.name;
+                      }
+                    } catch (e) {
+                      Get.snackbar('Error', 'Failed to pick image: $e');
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.grayFade(0.2)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.image_outlined, color: primaryIndigo, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          soc.logoUrl.isNotEmpty ? 'Change Society Logo Image' : 'Upload Society Logo Image',
+                          style: const TextStyle(color: primaryIndigo, fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+              const SizedBox(height: 8),
+              _buildTextField(controller: logoController, label: 'Logo URL (optional fallback)', hint: 'https://...'),
               const SizedBox(height: 16),
 
               // Add an event
@@ -1840,11 +2096,20 @@ class SocietiesView extends GetView<SocietiesController> {
                             }
                           }
 
+                          String finalLogoUrl = logoController.text.trim();
+                          if (pickedEditLogoFile.value != null) {
+                            final uploadedLogo = await controller.uploadSocietyLogo(pickedEditLogoFile.value!);
+                            if (uploadedLogo != null && uploadedLogo.isNotEmpty) {
+                              finalLogoUrl = uploadedLogo;
+                            }
+                          }
+
                           final success = await controller.updateSociety(
                             societyId: soc.id,
                             societyPassword: currentPassword,
                             department: deptController.text.trim(),
                             description: descController.text.trim(),
+                            logoUrl: finalLogoUrl,
                             category: selectedCategory.value,
                             websiteLink: websiteController.text.trim(),
                             registrationLink: registrationController.text.trim(),
