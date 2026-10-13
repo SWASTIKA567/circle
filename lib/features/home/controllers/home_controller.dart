@@ -21,6 +21,7 @@ class HomeController extends GetxController {
 
   final List<String> tabTitles = [
     'Home & Events',
+    'ERP Attendance',
     'College Notes',
     'Circle AI Assistant',
     'Campus Societies',

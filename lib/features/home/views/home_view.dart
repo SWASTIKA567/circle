@@ -4,6 +4,7 @@ import '../../../app/routes/app_routes.dart';
 import '../../../app/theme/app_theme.dart';
 import '../controllers/home_controller.dart';
 import '../../events/views/events_view.dart';
+import '../../attendance/views/attendance_view.dart';
 import '../../notes/views/notes_view.dart';
 import '../../chatbot/views/chatbot_view.dart';
 import '../../societies/views/societies_view.dart';
@@ -349,6 +350,7 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     final tabs = const [
       EventsView(),
+      AttendanceView(),
       NotesView(),
       ChatbotView(),
       SocietiesView(),
@@ -458,6 +460,11 @@ class HomeView extends GetView<HomeController> {
                 icon: Icon(Icons.home_outlined, color: AppColors.gray),
                 selectedIcon: Icon(Icons.home_rounded, color: AppColors.card),
                 label: 'Home',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.fact_check_outlined, color: AppColors.gray),
+                selectedIcon: Icon(Icons.fact_check_rounded, color: AppColors.card),
+                label: 'Attendance',
               ),
               NavigationDestination(
                 icon: Icon(Icons.menu_book_outlined, color: AppColors.gray),

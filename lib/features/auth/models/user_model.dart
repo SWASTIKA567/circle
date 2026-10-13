@@ -23,6 +23,7 @@ class UserModel {
   final bool isSocietyMember;
   final bool isAdmin;
   final String role;
+  final String? erpUserId;
   final String? token;
   final DateTime? createdAt;
 
@@ -51,6 +52,7 @@ class UserModel {
     this.isSocietyMember = false,
     this.isAdmin = false,
     this.role = 'student',
+    this.erpUserId,
     this.token,
     this.createdAt,
   });
@@ -85,6 +87,7 @@ class UserModel {
       isSocietyMember: userData['isSocietyMember'] ?? false,
       isAdmin: isAdminVal,
       role: roleVal,
+      erpUserId: userData['erpUserId'],
       token: token ?? json['token'],
       createdAt: userData['createdAt'] != null
           ? DateTime.tryParse(userData['createdAt'])
@@ -117,6 +120,7 @@ class UserModel {
     bool? isSocietyMember,
     bool? isAdmin,
     String? role,
+    String? erpUserId,
     String? token,
     DateTime? createdAt,
   }) {
@@ -145,6 +149,7 @@ class UserModel {
       isSocietyMember: isSocietyMember ?? this.isSocietyMember,
       isAdmin: isAdmin ?? this.isAdmin,
       role: role ?? this.role,
+      erpUserId: erpUserId ?? this.erpUserId,
       token: token ?? this.token,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -176,6 +181,7 @@ class UserModel {
       'isSocietyMember': isSocietyMember,
       'isAdmin': isAdmin,
       'role': role,
+      if (erpUserId != null) 'erpUserId': erpUserId,
       if (token != null) 'token': token,
       if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
     };
