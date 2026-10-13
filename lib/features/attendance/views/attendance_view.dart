@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../app/routes/app_routes.dart';
 import '../../../app/theme/app_theme.dart';
+import '../../auth/controllers/auth_controller.dart';
 import '../controllers/attendance_controller.dart';
 import '../models/attendance_model.dart';
 
@@ -87,16 +89,58 @@ class AttendanceView extends StatelessWidget {
                           style: const TextStyle(fontSize: 13, color: AppColors.gray, height: 1.4),
                         ),
                         const SizedBox(height: 20),
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.card,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          icon: const Icon(Icons.refresh_rounded, size: 18),
-                          label: const Text('Retry Fetch', style: TextStyle(fontWeight: FontWeight.bold)),
-                          onPressed: () => controller.fetchAttendance(refresh: true),
+                        Builder(
+                          builder: (context) {
+                            final msg = controller.errorMessage.value.toLowerCase();
+                            final isNotLinked = msg.contains('not linked') ||
+                                msg.contains('sign in') ||
+                                msg.contains('sign out') ||
+                                msg.contains('400');
+
+                            if (isNotLinked) {
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.card,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    ),
+                                    icon: const Icon(Icons.login_rounded, size: 18),
+                                    label: const Text('Sign In to Link ERP', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    onPressed: () {
+                                      if (Get.isRegistered<AuthController>()) {
+                                        Get.find<AuthController>().logout(prompt: false);
+                                      } else {
+                                        Get.offAllNamed(Routes.LOGIN);
+                                      }
+                                    },
+                                  ),
+                                  const SizedBox(height: 8),
+                                  TextButton.icon(
+                                    style: TextButton.styleFrom(foregroundColor: AppColors.gray),
+                                    icon: const Icon(Icons.refresh_rounded, size: 16),
+                                    label: const Text('Retry Fetch'),
+                                    onPressed: () => controller.fetchAttendance(refresh: true),
+                                  ),
+                                ],
+                              );
+                            }
+
+                            return ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.card,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              icon: const Icon(Icons.refresh_rounded, size: 18),
+                              label: const Text('Retry Fetch', style: TextStyle(fontWeight: FontWeight.bold)),
+                              onPressed: () => controller.fetchAttendance(refresh: true),
+                            );
+                          },
                         ),
                       ],
                     ),
