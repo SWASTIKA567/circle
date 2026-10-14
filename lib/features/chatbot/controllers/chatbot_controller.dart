@@ -19,7 +19,7 @@ class ChatbotController extends GetxController {
   final RxList<ChatMessage> messages = <ChatMessage>[
     const ChatMessage(
       isUser: false,
-      text: 'Hello! I am Circle AI, powered by your campus ML assistant. Ask me anything about campus locations, amphitheatre, events, or college notes!',
+      text: 'Hello! I am Circle AI. Ask me anything about campus locations, amphitheatre, events, or college notes!',
     ),
   ].obs;
 
