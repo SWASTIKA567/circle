@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../app/routes/app_routes.dart';
 import '../../../app/theme/app_theme.dart';
-import '../../auth/controllers/auth_controller.dart';
 import '../controllers/attendance_controller.dart';
 import '../models/attendance_model.dart';
 
@@ -89,30 +87,16 @@ class AttendanceView extends StatelessWidget {
                           style: const TextStyle(fontSize: 13, color: AppColors.gray, height: 1.4),
                         ),
                         const SizedBox(height: 20),
-                        Builder(
-                          builder: (context) {
-                            final msg = controller.errorMessage.value.toLowerCase();
-                            final isNotLinked = msg.contains('not linked') ||
-                                msg.contains('sign in') ||
-                                msg.contains('sign out') ||
-                                msg.contains('400');
-
-                            if (isNotLinked) {
-                              return _ErpLinkCard(controller: controller);
-                            }
-
-                            return ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.card,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              ),
-                              icon: const Icon(Icons.refresh_rounded, size: 18),
-                              label: const Text('Retry Fetch', style: TextStyle(fontWeight: FontWeight.bold)),
-                              onPressed: () => controller.fetchAttendance(refresh: true),
-                            );
-                          },
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.card,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          icon: const Icon(Icons.refresh_rounded, size: 18),
+                          label: const Text('Retry Fetch', style: TextStyle(fontWeight: FontWeight.bold)),
+                          onPressed: () => controller.fetchAttendance(refresh: true),
                         ),
                       ],
                     ),
@@ -577,134 +561,4 @@ class AttendanceView extends StatelessWidget {
   }
 }
 
-class _ErpLinkCard extends StatefulWidget {
-  final AttendanceController controller;
-  const _ErpLinkCard({required this.controller});
-
-  @override
-  State<_ErpLinkCard> createState() => _ErpLinkCardState();
-}
-
-class _ErpLinkCardState extends State<_ErpLinkCard> {
-  final _passwordController = TextEditingController();
-  bool _obscure = true;
-  bool _isSyncing = false;
-
-  @override
-  void dispose() {
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submit() async {
-    final pwd = _passwordController.text.trim();
-    if (pwd.isEmpty) {
-      Get.snackbar(
-        'Password Required',
-        'Please enter your AKGEC ERP password.',
-        backgroundColor: AppColors.pinkLight,
-        colorText: AppColors.magenta,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
-    setState(() => _isSyncing = true);
-    await widget.controller.linkCredentials(pwd);
-    if (mounted) setState(() => _isSyncing = false);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Link AKGEC ERP Account',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppColors.text,
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'Enter your ERP password to load live attendance records directly onto your phone.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              color: AppColors.gray,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 18),
-          TextField(
-            controller: _passwordController,
-            obscureText: _obscure,
-            decoration: InputDecoration(
-              hintText: 'Enter ERP Password',
-              hintStyle: const TextStyle(fontSize: 13, color: AppColors.gray),
-              prefixIcon: const Icon(Icons.lock_outline, size: 20, color: AppColors.gray),
-              suffixIcon: IconButton(
-                icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, size: 20, color: AppColors.gray),
-                onPressed: () => setState(() => _obscure = !_obscure),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.grayFade(0.2)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.card, width: 1.5),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.card,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 13),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            onPressed: _isSyncing ? null : _submit,
-            child: _isSyncing
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                  )
-                : const Text('Sync Attendance Directly', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-          const SizedBox(height: 8),
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: AppColors.gray),
-            onPressed: () {
-              if (Get.isRegistered<AuthController>()) {
-                Get.find<AuthController>().logout(prompt: false);
-              } else {
-                Get.offAllNamed(Routes.LOGIN);
-              }
-            },
-            child: const Text('Or Sign Out & Sign In Again', style: TextStyle(fontSize: 12)),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
