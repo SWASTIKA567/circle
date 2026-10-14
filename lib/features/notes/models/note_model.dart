@@ -4,6 +4,7 @@ class NoteModel {
   final String subject;
   final String semester;
   final String unit;
+  final String branch;
   final String author;
   final String fileName;
   final String fileUrl;
@@ -19,6 +20,7 @@ class NoteModel {
     required this.subject,
     required this.semester,
     required this.unit,
+    this.branch = 'All Branches',
     required this.author,
     required this.fileName,
     required this.fileUrl,
@@ -39,6 +41,7 @@ class NoteModel {
       subject: json['subject'] ?? 'General',
       semester: json['semester'] ?? 'Semester 1',
       unit: json['unit'] ?? 'Unit 1',
+      branch: json['branch'] ?? 'All Branches',
       author: json['author'] ?? 'Anonymous',
       fileName: json['fileName'] ?? '',
       fileUrl: json['fileUrl'] ?? '',
@@ -59,6 +62,7 @@ class NoteModel {
       'subject': subject,
       'semester': semester,
       'unit': unit,
+      'branch': branch,
       'author': author,
       'fileName': fileName,
       'fileUrl': fileUrl,

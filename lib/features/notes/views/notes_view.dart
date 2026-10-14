@@ -582,6 +582,20 @@ class NotesView extends GetView<NotesController> {
                     style: const TextStyle(fontSize: 11, color: AppColors.gray, fontWeight: FontWeight.w600),
                   ),
                 ),
+                if (note.branch.isNotEmpty && note.branch != 'All Branches') ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.greenLight,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      note.branch,
+                      style: const TextStyle(fontSize: 11, color: Color(0xFF15803D), fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                ],
                 const Spacer(),
                 OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
@@ -697,6 +711,31 @@ class NotesView extends GetView<NotesController> {
       'Semester 7',
       'Semester 8',
     ];
+
+    final branches = [
+      'CSE',
+      'IT',
+      'ECE',
+      'CS',
+      'CSE (AI & ML)',
+      'CSE (DS)',
+      'CSIT',
+      'EN',
+      'ME',
+      'Civil',
+      'All Branches',
+    ];
+
+    final authUser = Get.isRegistered<AuthController>() ? Get.find<AuthController>().currentUser.value : null;
+    String initialBranch = 'CSE';
+    if (authUser?.branch != null && authUser!.branch!.isNotEmpty) {
+      final userBr = authUser.branch!.toLowerCase();
+      final matched = branches.firstWhereOrNull((b) => b.toLowerCase() == userBr || userBr.contains(b.toLowerCase()));
+      if (matched != null) {
+        initialBranch = matched;
+      }
+    }
+    final selectedBranch = initialBranch.obs;
 
     Get.bottomSheet(
       Container(
@@ -924,7 +963,38 @@ class NotesView extends GetView<NotesController> {
               ),
               const SizedBox(height: 14),
 
-              // Subject & Semester Row
+              // Subject input
+              const Text(
+                'Subject',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.text),
+              ),
+              const SizedBox(height: 6),
+              TextField(
+                controller: subjectController,
+                style: const TextStyle(fontSize: 14, color: AppColors.text),
+                decoration: InputDecoration(
+                  hintText: 'e.g. Operating Systems',
+                  hintStyle: const TextStyle(color: AppColors.gray, fontSize: 13),
+                  filled: true,
+                  fillColor: AppColors.background,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppColors.grayFade(0.2)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppColors.grayFade(0.2)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.purple, width: 1.6),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // Branch & Semester Row
               Row(
                 children: [
                   Expanded(
@@ -932,33 +1002,37 @@ class NotesView extends GetView<NotesController> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Subject',
+                          'Branch',
                           style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.text),
                         ),
                         const SizedBox(height: 6),
-                        TextField(
-                          controller: subjectController,
-                          style: const TextStyle(fontSize: 14, color: AppColors.text),
-                          decoration: InputDecoration(
-                            hintText: 'e.g. Operating Systems',
-                            hintStyle: const TextStyle(color: AppColors.gray, fontSize: 13),
-                            filled: true,
-                            fillColor: AppColors.background,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: AppColors.grayFade(0.2)),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: AppColors.grayFade(0.2)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: AppColors.purple, width: 1.6),
+                        Obx(() => Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.grayFade(0.2)),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: selectedBranch.value,
+                              isExpanded: true,
+                              items: branches
+                                  .map((b) => DropdownMenuItem(
+                                        value: b,
+                                        child: Text(
+                                          b,
+                                          style: const TextStyle(fontSize: 13, color: AppColors.text),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ))
+                                  .toList(),
+                              onChanged: (val) {
+                                if (val != null) selectedBranch.value = val;
+                              },
                             ),
                           ),
-                        ),
+                        )),
                       ],
                     ),
                   ),
@@ -1055,6 +1129,7 @@ class NotesView extends GetView<NotesController> {
                             subject: subjectController.text.trim(),
                             semester: selectedSemester.value,
                             unit: unitController.text.trim().isEmpty ? 'Unit 1' : unitController.text.trim(),
+                            branch: selectedBranch.value,
                           );
 
                           if (success) {

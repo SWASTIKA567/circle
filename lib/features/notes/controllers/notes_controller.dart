@@ -51,6 +51,7 @@ class NotesController extends GetxController {
           note.title.toLowerCase().contains(query) ||
           note.subject.toLowerCase().contains(query) ||
           note.unit.toLowerCase().contains(query) ||
+          note.branch.toLowerCase().contains(query) ||
           note.semester.toLowerCase().contains(query) ||
           note.fileName.toLowerCase().contains(query) ||
           note.author.toLowerCase().contains(query);
@@ -130,6 +131,7 @@ class NotesController extends GetxController {
     required String subject,
     required String semester,
     required String unit,
+    String branch = 'All Branches',
   }) async {
     try {
       isUploading.value = true;
@@ -150,6 +152,7 @@ class NotesController extends GetxController {
         'subject': subject.trim(),
         'semester': semester.trim(),
         'unit': unit.trim(),
+        'branch': branch.trim(),
         'author': authorName,
       };
 
