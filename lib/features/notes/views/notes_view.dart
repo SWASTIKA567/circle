@@ -514,6 +514,33 @@ class NotesView extends GetView<NotesController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (!note.isApproved || note.status == 'pending') ...[
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF3C7),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFFDE68A)),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.hourglass_top_rounded, size: 14, color: Color(0xFFD97706)),
+                    SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        'Status: Pending • Waiting for Admin Approval (typically verified in a few mins)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFB45309),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -630,53 +657,76 @@ class NotesView extends GetView<NotesController> {
                     final isAdmin = currentUser?.isAdmin == true || currentUser?.role == 'admin';
                     if (!isAdmin) return const SizedBox.shrink();
 
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 6),
-                      child: IconButton(
-                        style: IconButton.styleFrom(
-                          foregroundColor: AppColors.magenta,
-                          backgroundColor: AppColors.pinkLight,
-                          padding: const EdgeInsets.all(7),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        icon: const Icon(Icons.delete_outline_rounded, size: 17),
-                        tooltip: 'Delete Note (Admin)',
-                        onPressed: () {
-                          Get.dialog(
-                            AlertDialog(
-                              backgroundColor: AppColors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                              title: const Row(
-                                children: [
-                                  Icon(Icons.delete_forever_rounded, color: AppColors.magenta),
-                                  SizedBox(width: 8),
-                                  Text('Delete Note', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.text)),
-                                ],
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (!note.isApproved)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 6),
+                            child: IconButton(
+                              style: IconButton.styleFrom(
+                                foregroundColor: const Color(0xFF15803D),
+                                backgroundColor: const Color(0xFFDCFCE7),
+                                padding: const EdgeInsets.all(7),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                visualDensity: VisualDensity.compact,
                               ),
-                              content: Text('Are you sure you want to permanently delete "${note.title}"? This will also remove the PDF file from the server.'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Get.back(),
-                                  child: const Text('Cancel', style: TextStyle(color: AppColors.gray)),
-                                ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.magenta,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                  onPressed: () {
-                                    Get.back();
-                                    controller.deleteNote(note.id);
-                                  },
-                                  child: const Text('Delete'),
-                                ),
-                              ],
+                              icon: const Icon(Icons.check_circle_rounded, size: 17),
+                              tooltip: 'Approve Note (Admin)',
+                              onPressed: () {
+                                controller.approveNote(note.id);
+                              },
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 6),
+                          child: IconButton(
+                            style: IconButton.styleFrom(
+                              foregroundColor: AppColors.magenta,
+                              backgroundColor: AppColors.pinkLight,
+                              padding: const EdgeInsets.all(7),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                            icon: const Icon(Icons.delete_outline_rounded, size: 17),
+                            tooltip: 'Delete Note (Admin)',
+                            onPressed: () {
+                              Get.dialog(
+                                AlertDialog(
+                                  backgroundColor: AppColors.white,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                  title: const Row(
+                                    children: [
+                                      Icon(Icons.delete_forever_rounded, color: AppColors.magenta),
+                                      SizedBox(width: 8),
+                                      Text('Delete Note', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.text)),
+                                    ],
+                                  ),
+                                  content: Text('Are you sure you want to permanently delete "${note.title}"? This will also remove the PDF file from the server.'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Get.back(),
+                                      child: const Text('Cancel', style: TextStyle(color: AppColors.gray)),
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.magenta,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      ),
+                                      onPressed: () {
+                                        Get.back();
+                                        controller.deleteNote(note.id);
+                                      },
+                                      child: const Text('Delete'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     );
                   },
                 ),

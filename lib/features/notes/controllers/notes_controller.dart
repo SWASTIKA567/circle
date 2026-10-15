@@ -112,7 +112,12 @@ class NotesController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      final response = await ApiService.get('/notes');
+      String? token;
+      if (Get.isRegistered<AuthController>()) {
+        token = Get.find<AuthController>().currentUser.value?.token;
+      }
+
+      final response = await ApiService.get('/notes', token: token);
 
       if (response['success'] == true && response['notes'] is List) {
         final List noteList = response['notes'];
@@ -166,13 +171,12 @@ class NotesController extends GetxController {
 
       if (response['success'] == true && response['note'] != null) {
         final newNote = NoteModel.fromJson(response['note']);
-        if (newNote.isApproved) {
-          notes.insert(0, newNote);
-        }
+        notes.removeWhere((n) => n.id == newNote.id);
+        notes.insert(0, newNote);
 
         Get.snackbar(
-          'Submitted for Approval 📋',
-          response['message'] ?? '"${newNote.title}" uploaded! It will be visible after Admin approval.',
+          'Submitted for Approval ⏳',
+          'Note "${newNote.title}" uploaded! It is waiting for admin approval (usually within a few minutes).',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: AppColors.card,
           colorText: AppColors.white,
@@ -200,19 +204,22 @@ class NotesController extends GetxController {
   }
 
   Future<void> openNotePdf(NoteModel note) async {
-    if (note.fileUrl.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'PDF URL not available for this note.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.pinkLight,
-        colorText: AppColors.magenta,
-        margin: const EdgeInsets.all(16),
-      );
-      return;
+    String? token;
+    if (Get.isRegistered<AuthController>()) {
+      token = Get.find<AuthController>().currentUser.value?.token;
     }
 
-    final fullUrl = ApiService.resolveFileUrl(note.fileUrl);
+    String pathUrl = note.fileUrl.isNotEmpty
+        ? note.fileUrl
+        : '/api/notes/file/${note.id}';
+
+    String fullUrl = ApiService.resolveFileUrl(pathUrl);
+
+    if (token != null && token.isNotEmpty && (fullUrl.contains('/api/notes/') || fullUrl.contains('/notes/'))) {
+      final separator = fullUrl.contains('?') ? '&' : '?';
+      fullUrl = '$fullUrl${separator}token=$token';
+    }
+
     final uri = Uri.parse(fullUrl);
 
     try {
@@ -220,13 +227,12 @@ class NotesController extends GetxController {
       if (canLaunch) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        // Fallback with platform default mode
         await launchUrl(uri);
       }
     } catch (e) {
       Get.snackbar(
         'Could Not Open PDF',
-        'Unable to open $fullUrl: $e',
+        'Unable to open preview: $e',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppColors.pinkLight,
         colorText: AppColors.magenta,
@@ -236,7 +242,17 @@ class NotesController extends GetxController {
   }
 
   Future<void> downloadNotePdf(NoteModel note) async {
-    final downloadUrl = ApiService.resolveFileUrl('/api/notes/download/${note.id}');
+    String? token;
+    if (Get.isRegistered<AuthController>()) {
+      token = Get.find<AuthController>().currentUser.value?.token;
+    }
+
+    String downloadUrl = ApiService.resolveFileUrl('/api/notes/download/${note.id}');
+    if (token != null && token.isNotEmpty) {
+      final separator = downloadUrl.contains('?') ? '&' : '?';
+      downloadUrl = '$downloadUrl${separator}token=$token';
+    }
+
     final uri = Uri.parse(downloadUrl);
 
     try {
@@ -265,6 +281,61 @@ class NotesController extends GetxController {
         colorText: AppColors.magenta,
         margin: const EdgeInsets.all(16),
       );
+    }
+  }
+
+  Future<bool> approveNote(String noteId) async {
+    try {
+      String? token;
+      if (Get.isRegistered<AuthController>()) {
+        token = Get.find<AuthController>().currentUser.value?.token;
+      }
+
+      final response = await ApiService.put('/admin/notes/$noteId/approve', {}, token: token);
+
+      if (response['success'] == true) {
+        final idx = notes.indexWhere((n) => n.id == noteId);
+        if (idx != -1) {
+          final old = notes[idx];
+          notes[idx] = NoteModel(
+            id: old.id,
+            title: old.title,
+            subject: old.subject,
+            semester: old.semester,
+            unit: old.unit,
+            branch: old.branch,
+            author: old.author,
+            fileName: old.fileName,
+            fileUrl: old.fileUrl,
+            fileSize: old.fileSize,
+            pages: old.pages,
+            status: 'approved',
+            isApproved: true,
+            createdAt: old.createdAt,
+          );
+        }
+
+        Get.snackbar(
+          'Note Approved ✅',
+          response['message'] ?? 'Note approved and published for all students!',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.card,
+          colorText: AppColors.white,
+          margin: const EdgeInsets.all(16),
+        );
+        return true;
+      }
+      return false;
+    } catch (e) {
+      Get.snackbar(
+        'Approval Failed',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.pinkLight,
+        colorText: AppColors.magenta,
+        margin: const EdgeInsets.all(16),
+      );
+      return false;
     }
   }
 
