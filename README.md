@@ -1,16 +1,41 @@
-# college_notes
+# 📱 Circle — Flutter Mobile App
 
-A new Flutter project.
+This is the mobile app for **Circle** (College Companion App). It is built using Flutter and Dart.
 
-## Getting Started
+For the full guide and backend setup, see the [Main Project README](../README.md).
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 🚀 Quick Start for App Devs
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 1. Get packages
+```bash
+flutter pub get
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 2. Connect a phone or start an emulator
+Run `flutter devices` to make sure your phone or emulator is detected.
+
+### 3. Run the app
+```bash
+flutter run
+```
+
+### 4. Build an APK for your Android phone
+```bash
+flutter build apk --release
+```
+Your APK will be ready at:
+`build/app/outputs/flutter-apk/app-release.apk`
+
+---
+
+## 📁 Key Folders Inside `lib/`
+
+- **`features/attendance`**: Live AKGEC ERP attendance screen, bunk & target attendance calculator.
+- **`features/notes`**: Notes list by semester/subject, PDF viewer, and file uploader.
+- **`features/societies`**: College clubs, event listings, and registration links.
+- **`features/chatbot`**: Campus AI chat screen with quick prompt buttons.
+- **`features/auth`**: Login and registration screens.
+- **`app/theme`**: App colors and fonts (`Chicle` and `KaushanScript`).
+- **`core/services`**: `api_service.dart` handles all calls to the backend server.
